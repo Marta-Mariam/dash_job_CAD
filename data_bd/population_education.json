@@ -1,0 +1,1640 @@
+[
+	{
+		"year" : 2017,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "163591"
+	},
+	{
+		"year" : 2017,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "209587"
+	},
+	{
+		"year" : 2017,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "509592"
+	},
+	{
+		"year" : 2017,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "538258"
+	},
+	{
+		"year" : 2017,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "538258"
+	},
+	{
+		"year" : 2017,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "336404"
+	},
+	{
+		"year" : 2017,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "188688"
+	},
+	{
+		"year" : 2017,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "357906"
+	},
+	{
+		"year" : 2017,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "383111"
+	},
+	{
+		"year" : 2017,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "44401"
+	},
+	{
+		"year" : 2017,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "76923"
+	},
+	{
+		"year" : 2017,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "76923"
+	},
+	{
+		"year" : 2017,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "350602"
+	},
+	{
+		"year" : 2017,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "519433"
+	},
+	{
+		"year" : 2017,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "134787"
+	},
+	{
+		"year" : 2017,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "140949"
+	},
+	{
+		"year" : 2017,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "565442"
+	},
+	{
+		"year" : 2017,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "208702"
+	},
+	{
+		"year" : 2017,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "401410"
+	},
+	{
+		"year" : 2017,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "222149"
+	},
+	{
+		"year" : 2018,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "161911"
+	},
+	{
+		"year" : 2018,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "208713"
+	},
+	{
+		"year" : 2018,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "518709"
+	},
+	{
+		"year" : 2018,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "533597"
+	},
+	{
+		"year" : 2018,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "533597"
+	},
+	{
+		"year" : 2018,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "336248"
+	},
+	{
+		"year" : 2018,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "191847"
+	},
+	{
+		"year" : 2018,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "357498"
+	},
+	{
+		"year" : 2018,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "397609"
+	},
+	{
+		"year" : 2018,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "44321"
+	},
+	{
+		"year" : 2018,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "78131"
+	},
+	{
+		"year" : 2018,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "78131"
+	},
+	{
+		"year" : 2018,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "354525"
+	},
+	{
+		"year" : 2018,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "527861"
+	},
+	{
+		"year" : 2018,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "131356"
+	},
+	{
+		"year" : 2018,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "143154"
+	},
+	{
+		"year" : 2018,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "568516"
+	},
+	{
+		"year" : 2018,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "217983"
+	},
+	{
+		"year" : 2018,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "394972"
+	},
+	{
+		"year" : 2018,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "216939"
+	},
+	{
+		"year" : 2019,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "159795"
+	},
+	{
+		"year" : 2019,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "207482"
+	},
+	{
+		"year" : 2019,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "522746"
+	},
+	{
+		"year" : 2019,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "529187"
+	},
+	{
+		"year" : 2019,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "529187"
+	},
+	{
+		"year" : 2019,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "336157"
+	},
+	{
+		"year" : 2019,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "193839"
+	},
+	{
+		"year" : 2019,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "356628"
+	},
+	{
+		"year" : 2019,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "408026"
+	},
+	{
+		"year" : 2019,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "44461"
+	},
+	{
+		"year" : 2019,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "79067"
+	},
+	{
+		"year" : 2019,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "79067"
+	},
+	{
+		"year" : 2019,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "352172"
+	},
+	{
+		"year" : 2019,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "536137"
+	},
+	{
+		"year" : 2019,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "128075"
+	},
+	{
+		"year" : 2019,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "143823"
+	},
+	{
+		"year" : 2019,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "573024"
+	},
+	{
+		"year" : 2019,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "226336"
+	},
+	{
+		"year" : 2019,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "386537"
+	},
+	{
+		"year" : 2019,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "214572"
+	},
+	{
+		"year" : 2020,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "156958"
+	},
+	{
+		"year" : 2020,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "205240"
+	},
+	{
+		"year" : 2020,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "523497"
+	},
+	{
+		"year" : 2020,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "521875"
+	},
+	{
+		"year" : 2020,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "521875"
+	},
+	{
+		"year" : 2020,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "331550"
+	},
+	{
+		"year" : 2020,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "194934"
+	},
+	{
+		"year" : 2020,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "355621"
+	},
+	{
+		"year" : 2020,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "412886"
+	},
+	{
+		"year" : 2020,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "44353"
+	},
+	{
+		"year" : 2020,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "78910"
+	},
+	{
+		"year" : 2020,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "78910"
+	},
+	{
+		"year" : 2020,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "347022"
+	},
+	{
+		"year" : 2020,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "538323"
+	},
+	{
+		"year" : 2020,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "125731"
+	},
+	{
+		"year" : 2020,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "142655"
+	},
+	{
+		"year" : 2020,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "580100"
+	},
+	{
+		"year" : 2020,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "229403"
+	},
+	{
+		"year" : 2020,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "384385"
+	},
+	{
+		"year" : 2020,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 0,
+		"garden_kids" : 0,
+		"population" : "210899"
+	},
+	{
+		"year" : 2021,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 16655,
+		"garden_kids" : 0,
+		"population" : "153735"
+	},
+	{
+		"year" : 2021,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 18644,
+		"garden_kids" : 0,
+		"population" : "202288"
+	},
+	{
+		"year" : 2021,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 52010,
+		"garden_kids" : 0,
+		"population" : "528147"
+	},
+	{
+		"year" : 2021,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 47192,
+		"garden_kids" : 0,
+		"population" : "512182"
+	},
+	{
+		"year" : 2021,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 47192,
+		"garden_kids" : 0,
+		"population" : "512182"
+	},
+	{
+		"year" : 2021,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 31077,
+		"garden_kids" : 0,
+		"population" : "325118"
+	},
+	{
+		"year" : 2021,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 20005,
+		"garden_kids" : 0,
+		"population" : "197253"
+	},
+	{
+		"year" : 2021,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 36849,
+		"garden_kids" : 0,
+		"population" : "354989"
+	},
+	{
+		"year" : 2021,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 53098,
+		"garden_kids" : 0,
+		"population" : "419779"
+	},
+	{
+		"year" : 2021,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 4147,
+		"garden_kids" : 0,
+		"population" : "44290"
+	},
+	{
+		"year" : 2021,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 7624,
+		"garden_kids" : 0,
+		"population" : "79842"
+	},
+	{
+		"year" : 2021,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 7624,
+		"garden_kids" : 0,
+		"population" : "79842"
+	},
+	{
+		"year" : 2021,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 32136,
+		"garden_kids" : 0,
+		"population" : "342562"
+	},
+	{
+		"year" : 2021,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 53700,
+		"garden_kids" : 0,
+		"population" : "540415"
+	},
+	{
+		"year" : 2021,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 14696,
+		"garden_kids" : 0,
+		"population" : "124132"
+	},
+	{
+		"year" : 2021,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 13306,
+		"garden_kids" : 0,
+		"population" : "142397"
+	},
+	{
+		"year" : 2021,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 63272,
+		"garden_kids" : 0,
+		"population" : "585554"
+	},
+	{
+		"year" : 2021,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 31188,
+		"garden_kids" : 0,
+		"population" : "233856"
+	},
+	{
+		"year" : 2021,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 37599,
+		"garden_kids" : 0,
+		"population" : "383799"
+	},
+	{
+		"year" : 2021,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 21958,
+		"garden_kids" : 0,
+		"population" : "207165"
+	},
+	{
+		"year" : 2022,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 16333,
+		"garden_kids" : 0,
+		"population" : "155981"
+	},
+	{
+		"year" : 2022,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 21684,
+		"garden_kids" : 0,
+		"population" : "206680"
+	},
+	{
+		"year" : 2022,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 53891,
+		"garden_kids" : 0,
+		"population" : "541590"
+	},
+	{
+		"year" : 2022,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 48607,
+		"garden_kids" : 0,
+		"population" : "536794"
+	},
+	{
+		"year" : 2022,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 48607,
+		"garden_kids" : 0,
+		"population" : "536794"
+	},
+	{
+		"year" : 2022,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 31404,
+		"garden_kids" : 0,
+		"population" : "335774"
+	},
+	{
+		"year" : 2022,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 20813,
+		"garden_kids" : 0,
+		"population" : "186169"
+	},
+	{
+		"year" : 2022,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 38695,
+		"garden_kids" : 0,
+		"population" : "366971"
+	},
+	{
+		"year" : 2022,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 55541,
+		"garden_kids" : 0,
+		"population" : "431546"
+	},
+	{
+		"year" : 2022,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 4289,
+		"garden_kids" : 0,
+		"population" : "44414"
+	},
+	{
+		"year" : 2022,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 8033,
+		"garden_kids" : 0,
+		"population" : "83491"
+	},
+	{
+		"year" : 2022,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 8033,
+		"garden_kids" : 0,
+		"population" : "83491"
+	},
+	{
+		"year" : 2022,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 33887,
+		"garden_kids" : 0,
+		"population" : "335221"
+	},
+	{
+		"year" : 2022,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 56476,
+		"garden_kids" : 0,
+		"population" : "547896"
+	},
+	{
+		"year" : 2022,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 15013,
+		"garden_kids" : 0,
+		"population" : "115757"
+	},
+	{
+		"year" : 2022,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 13594,
+		"garden_kids" : 0,
+		"population" : "134148"
+	},
+	{
+		"year" : 2022,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 67027,
+		"garden_kids" : 0,
+		"population" : "699243"
+	},
+	{
+		"year" : 2022,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 32924,
+		"garden_kids" : 0,
+		"population" : "263732"
+	},
+	{
+		"year" : 2022,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 38280,
+		"garden_kids" : 0,
+		"population" : "413983"
+	},
+	{
+		"year" : 2022,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 21645,
+		"garden_kids" : 0,
+		"population" : "200654"
+	},
+	{
+		"year" : 2023,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 16305,
+		"garden_kids" : 6407,
+		"population" : "154222"
+	},
+	{
+		"year" : 2023,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 19602,
+		"garden_kids" : 8063,
+		"population" : "205398"
+	},
+	{
+		"year" : 2023,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 55678,
+		"garden_kids" : 26231,
+		"population" : "543567"
+	},
+	{
+		"year" : 2023,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 49219,
+		"garden_kids" : 24974,
+		"population" : "530745"
+	},
+	{
+		"year" : 2023,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 49219,
+		"garden_kids" : 24974,
+		"population" : "530745"
+	},
+	{
+		"year" : 2023,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 31508,
+		"garden_kids" : 13818,
+		"population" : "330811"
+	},
+	{
+		"year" : 2023,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 21433,
+		"garden_kids" : 9418,
+		"population" : "188153"
+	},
+	{
+		"year" : 2023,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 40280,
+		"garden_kids" : 19995,
+		"population" : "365491"
+	},
+	{
+		"year" : 2023,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 57498,
+		"garden_kids" : 24574,
+		"population" : "434830"
+	},
+	{
+		"year" : 2023,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 4398,
+		"garden_kids" : 1933,
+		"population" : "44515"
+	},
+	{
+		"year" : 2023,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 8250,
+		"garden_kids" : 4086,
+		"population" : "83742"
+	},
+	{
+		"year" : 2023,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 8250,
+		"garden_kids" : 4086,
+		"population" : "83742"
+	},
+	{
+		"year" : 2023,
+		"area" : "Ленинградская область",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 0,
+		"garden_kids" : 115,
+		"population" : null
+	},
+	{
+		"year" : 2023,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 35000,
+		"garden_kids" : 16255,
+		"population" : "333156"
+	},
+	{
+		"year" : 2023,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 58915,
+		"garden_kids" : 27298,
+		"population" : "548830"
+	},
+	{
+		"year" : 2023,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 15541,
+		"garden_kids" : 5501,
+		"population" : "115314"
+	},
+	{
+		"year" : 2023,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 13762,
+		"garden_kids" : 6020,
+		"population" : "133171"
+	},
+	{
+		"year" : 2023,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 70055,
+		"garden_kids" : 31153,
+		"population" : "704075"
+	},
+	{
+		"year" : 2023,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 34840,
+		"garden_kids" : 15236,
+		"population" : "270213"
+	},
+	{
+		"year" : 2023,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 38781,
+		"garden_kids" : 17835,
+		"population" : "412919"
+	},
+	{
+		"year" : 2023,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 21528,
+		"garden_kids" : 6724,
+		"population" : "198611"
+	},
+	{
+		"year" : 2024,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 16827,
+		"garden_kids" : 0,
+		"population" : "154424"
+	},
+	{
+		"year" : 2024,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 19937,
+		"garden_kids" : 0,
+		"population" : "208720"
+	},
+	{
+		"year" : 2024,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 57698,
+		"garden_kids" : 0,
+		"population" : "551925"
+	},
+	{
+		"year" : 2024,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 49409,
+		"garden_kids" : 0,
+		"population" : "532972"
+	},
+	{
+		"year" : 2024,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 49409,
+		"garden_kids" : 0,
+		"population" : "532972"
+	},
+	{
+		"year" : 2024,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 31373,
+		"garden_kids" : 0,
+		"population" : "329419"
+	},
+	{
+		"year" : 2024,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 21596,
+		"garden_kids" : 0,
+		"population" : "189870"
+	},
+	{
+		"year" : 2024,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 41533,
+		"garden_kids" : 0,
+		"population" : "368354"
+	},
+	{
+		"year" : 2024,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 58502,
+		"garden_kids" : 0,
+		"population" : "440817"
+	},
+	{
+		"year" : 2024,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 4418,
+		"garden_kids" : 0,
+		"population" : "44655"
+	},
+	{
+		"year" : 2024,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 8342,
+		"garden_kids" : 0,
+		"population" : "84309"
+	},
+	{
+		"year" : 2024,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 8342,
+		"garden_kids" : 0,
+		"population" : "84309"
+	},
+	{
+		"year" : 2024,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 36054,
+		"garden_kids" : 0,
+		"population" : "333941"
+	},
+	{
+		"year" : 2024,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 60672,
+		"garden_kids" : 0,
+		"population" : "556880"
+	},
+	{
+		"year" : 2024,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 15962,
+		"garden_kids" : 0,
+		"population" : "118213"
+	},
+	{
+		"year" : 2024,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 13965,
+		"garden_kids" : 0,
+		"population" : "134895"
+	},
+	{
+		"year" : 2024,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 72384,
+		"garden_kids" : 0,
+		"population" : "714854"
+	},
+	{
+		"year" : 2024,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 36274,
+		"garden_kids" : 0,
+		"population" : "277341"
+	},
+	{
+		"year" : 2024,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 38441,
+		"garden_kids" : 0,
+		"population" : "412471"
+	},
+	{
+		"year" : 2024,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 21658,
+		"garden_kids" : 0,
+		"population" : "198862"
+	},
+	{
+		"year" : 2025,
+		"area" : "Адмиралтейский район",
+		"iogv_shortname" : "Администрация Адмиралтейского района",
+		"iogv_inn" : "7809029013",
+		"school_students" : 16971,
+		"garden_kids" : 4913,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Василеостровский район",
+		"iogv_shortname" : "Администрация Василеостровского района",
+		"iogv_inn" : "7801042446",
+		"school_students" : 20178,
+		"garden_kids" : 6897,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Выборгский район",
+		"iogv_shortname" : "Администрация Выборгского района",
+		"iogv_inn" : "7802047944",
+		"school_students" : 58759,
+		"garden_kids" : 24068,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 48943,
+		"garden_kids" : 20233,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Калининский район",
+		"iogv_shortname" : "Администрация Калининского района",
+		"iogv_inn" : "7804042349",
+		"school_students" : 48943,
+		"garden_kids" : 20233,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Кировский район",
+		"iogv_shortname" : "Администрация Кировского района",
+		"iogv_inn" : "7805059546",
+		"school_students" : 30370,
+		"garden_kids" : 11370,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Колпинский район",
+		"iogv_shortname" : "Администрация Колпинского района",
+		"iogv_inn" : "7817006891",
+		"school_students" : 21524,
+		"garden_kids" : 8256,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Красногвардейский район",
+		"iogv_shortname" : "Администрация Красногвардейского района",
+		"iogv_inn" : "7806042263",
+		"school_students" : 42113,
+		"garden_kids" : 17452,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Красносельский район",
+		"iogv_shortname" : "Администрация Красносельского района",
+		"iogv_inn" : "7807018464",
+		"school_students" : 57219,
+		"garden_kids" : 22434,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Кронштадтский район",
+		"iogv_shortname" : "Администрация Кронштадтского района",
+		"iogv_inn" : "7818003903",
+		"school_students" : 4390,
+		"garden_kids" : 1618,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Курортного района",
+		"iogv_inn" : "7821007802",
+		"school_students" : 8537,
+		"garden_kids" : 3459,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Курортный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 8537,
+		"garden_kids" : 3459,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Ленинградская область",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 0,
+		"garden_kids" : 124,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Московский район",
+		"iogv_shortname" : "Администрация Московского района",
+		"iogv_inn" : "7810435274",
+		"school_students" : 36233,
+		"garden_kids" : 14629,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Невский район",
+		"iogv_shortname" : "Администрация Невского района",
+		"iogv_inn" : "7811020096",
+		"school_students" : 61167,
+		"garden_kids" : 24266,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Петроградский район",
+		"iogv_shortname" : "Администрация Петроградского района",
+		"iogv_inn" : "7813047833",
+		"school_students" : 17198,
+		"garden_kids" : 4716,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Петродворцовый район",
+		"iogv_shortname" : "Администрация Петродворцового района",
+		"iogv_inn" : "7819000990",
+		"school_students" : 14160,
+		"garden_kids" : 5431,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Приморский район",
+		"iogv_shortname" : "Администрация Приморского района",
+		"iogv_inn" : "7814002313",
+		"school_students" : 73705,
+		"garden_kids" : 27928,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Пушкинский район",
+		"iogv_shortname" : "Администрация Пушкинского района",
+		"iogv_inn" : "7820033454",
+		"school_students" : 37228,
+		"garden_kids" : 14061,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Фрунзенский район",
+		"iogv_shortname" : "Администрация Фрунзенского района",
+		"iogv_inn" : "7816053440",
+		"school_students" : 37683,
+		"garden_kids" : 13821,
+		"population" : null
+	},
+	{
+		"year" : 2025,
+		"area" : "Центральный район",
+		"iogv_shortname" : "Администрация Центрального района",
+		"iogv_inn" : "7825660628",
+		"school_students" : 21160,
+		"garden_kids" : 5576,
+		"population" : null
+	}
+]

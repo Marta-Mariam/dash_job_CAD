@@ -1,0 +1,31 @@
+[
+	{
+		"year" : 2021,
+		"iogv_shortname" : "Администрация test района",
+		"education_type" : "сад",
+		"group_label" : "1",
+		"groups_or_classes" : 71,
+		"kids_or_students" : 1527,
+		"avg_per_group" : 21.5,
+		"pct" : 10.3
+	},
+	{
+		"year" : 2022,
+		"iogv_shortname" : "Администрация test_1 района",
+		"education_type" : "школа",
+		"group_label" : "2",
+		"groups_or_classes" : 61,
+		"kids_or_students" : 1337,
+		"avg_per_group" : 21.9,
+		"pct" : 9.0
+	},
+	{
+		"year" : 2025,
+		"iogv_shortname" : "Администрация test_2 района",
+		"education_type" : "школа",
+		"group_label" : "3",
+		"groups_or_classes" : 61,
+		"kids_or_students" : 1311,
+		"avg_per_group" : 21.5,
+		"pct" : 8.9
+	}]

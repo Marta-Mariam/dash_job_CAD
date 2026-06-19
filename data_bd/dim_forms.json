@@ -1,0 +1,15 @@
+{
+"SELECT DISTINCT form AS label\r\nFROM int_lsfusion.dim_directory_inn\r\nWHERE type_value IN ('ДОУ','СОШ','СПО')\r\n  AND form IS NOT NULL\r\nORDER BY form": [
+	{
+		"label" : "Автономные"
+	},
+	{
+		"label" : "Бюджетные"
+	},
+	{
+		"label" : "Казенные"
+	},
+	{
+		"label" : "Частные"
+	}
+]}

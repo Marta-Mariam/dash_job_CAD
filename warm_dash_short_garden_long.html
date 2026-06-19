@@ -1,0 +1,2549 @@
+<!-- Текст в таких скобках — комментарий, браузер его не показывает (только для чтения кода). -->
+<!DOCTYPE html>                                   <!-- объявление: это HTML5. Всегда первая строка -->
+<html lang="ru" class="theme-light" data-bs-theme="light">
+<!-- <html> — корневой тег, внутри него весь документ. Атрибуты = «настройки» тега:
+     lang="ru" язык; class="..." имя для CSS-стилей; data-bs-theme — тема Tabler. Закроется </html> в конце -->
+<head>                                            <!-- «шапка»: невидимая часть (мета, шрифты, стили) -->
+
+<!-- =====================================================================
+  ДАШБОРД ОБРАЗОВАНИЯ СПб — ЕДИНЫЙ ФАЙЛ (всё инлайн)
+  Заказчик: ГКУ "Центр архивных документов" Санкт-Петербурга
+  ---------------------------------------------------------------------
+  Собран из:
+    • dashboard2.htm      — каркас, шапка, фильтры, сетка блоков (кроме пустого блока Г)
+    • assets/css/dashboard.css — стили (перенесены инлайн в <style> ниже)
+    • assets/js/d2_kpi.js     — 4 KPI-карточки
+    • assets/js/d2_charts.js  — графики блоков А/Б/В
+    • assets/js/d2_app.js     — загрузка JSON, фильтры, оркестрация
+    • napolnyaemost.html      — блок «Наполняемость» (роза/heatmap/доля), вставлен ВМЕСТО
+                                пустой заглушки (блок Г). Работает НЕЗАВИСИМО от
+                                главного фильтра ИОГВ — у него свои кнопки.
+
+  ВСЕ ДАННЫЕ грузятся из папки data_bd/*.json (см. data_bd_sql.ipynb — там SQL).
+
+  ---------------------------------------------------------------------
+  ВИЗУАЛЬНЫЙ ЯЗЫК (редизайн 2): "Тёплый минимализм"
+    Светлая тема: тёплый крем #F7F4EF + графит #2B2A28 + чернила #3A4A63 + хвоя #3E7C6A + терракот #C2734A.
+    Тёмная тема: кофейный графит #1C1A17 + кремовый текст #F0EBE2 + осветлённые акценты (#8FA6C4/#6FBFA6/#E0976B).
+    Тепловые карты: СВЕТЛЫЕ пастельные шкалы (хвоя↔крем↔терракот), текст ячеек всегда тёмный #2B2A28 → читается.
+    Шрифты: Manrope (заголовки) + Inter (тело), tabular-nums для цифр.
+    Управление темой: data-bs-theme + .theme-light/.theme-dark (двойной алиас).
+    Кнопка темы: .viz-menu-toggle (#themeBtn) — переключатель свет/тьма в шапке.
+    Где менять палитру: блок :root (~стр.90) — 6 строк (--bg, --surface-*, три --accent*).
+    Где менять цвета графиков: KPI_STOPS (KPI), CHART_PALETTE (кольца/бары), buildVisualMap7 (тепловые карты).
+
+  =====================================================================
+  ВАЖНО — РАСХОЖДЕНИЕ ЧИСЕЛ ШКОЛЬНИКОВ (2025), задокументировано:
+    Разные блоки считают РАЗНЫЕ наборы ИОГВ, поэтому итоги не совпадают:
+      • KPI «Школьников» = Σ contingent_school.json = 607 538
+            (Администрации районов + Комитет по образованию)
+      • Кольцо «Контингент» (блок Б) = grup_count.json за 2025, фильтр r.iogv_shortname!=null
+            = 608 227 (Администрации + Комитеты образования и науки)
+      • Тепловая карта «По районам» (блок наполняемости) = только
+            «Администрация ... района» = 599 045 (Комитеты отброшены — у них нет района)
+    ПРИЧИНА: grup_count.json в SQL НЕ фильтруется по allowed_inns (в отличие от
+    contingent_school.json), а HTML-блоки режут по iogv по-разному.
+    Пока оставлено как есть — только задокументировано (по согласованию).
+====================================================================== -->
+
+  <!-- <meta> — настройки страницы, ничего не рисуют -->
+  <meta charset="UTF-8">                           <!-- кодировка UTF-8: кириллица не ломается -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- адаптив под телефоны -->
+  <meta name="theme-color" content="#3A4A63">       <!-- цвет адресной строки на мобильных (чернила) -->
+  <title>Дашборд образования СПб · ЦАД</title>      <!-- <title> — текст на вкладке браузера -->
+
+  <!-- <link> — подключает внешний файл. rel = ЧТО это, href = адрес ГДЕ лежит -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">              <!-- preconnect = заранее связаться с сервером (быстрее) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">  <!-- шрифты Manrope+Inter; wght = толщины -->
+
+  <!-- CDN = облачный сервер с готовыми библиотеками. rel="stylesheet" = файл стилей CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">     <!-- Tabler: готовая сетка/карточки/кнопки -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"> <!-- иконки (значки), пишутся <i class="ti ti-..."> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">       <!-- Choices.js: выпадашки с поиском. (.min = сжатый файл) -->
+
+  <!-- <style> — здесь живёт ВЕСЬ CSS (оформление: цвета, размеры, отступы).
+       CSS-правило выглядит так:  селектор { свойство: значение; }
+       Селектор = кого красим (.класс, #id, тег); внутри {} — как красим.
+       В CSS комментарий пишется иначе, чем в HTML: /* ... вот так ... */ -->
+  <style>
+    /* =====================================================================
+       1. ДИЗАЙН-ТОКЕНЫ — "Тёплый минимализм" (редизайн)
+       :root — «глобальные настройки». Тут заданы CSS-переменные: имена начинаются
+       с -- (напр. --bg). Дальше по коду их зовут через var(--bg). Удобно: поменял
+       цвет в одном месте — он сменился везде.
+
+       ИДЕЯ ПАЛИТРЫ (почему так):
+         Раньше фон был холодный сине-серый (#EDF1F6) — «технологично», но как у всех
+         дашбордов. Теперь фон ТЁПЛЫЙ кремовый (#F7F4EF) — ощущение бумаги/архива, что
+         подходит «Центру архивных документов». Текст — тёплый графит (с капелькой
+         коричневого, а не холодный синий). Акценты — природные, приглушённые:
+           • primary    = глубокие чернила/индиго (#3A4A63)  — спокойный, не кричит;
+           • secondary  = хвоя/тёмно-зелёный (#3E7C6A)        — «живой» акцент;
+           • tertiary   = терракот/охра (#C2734A)             — тёплый контрапункт.
+         Если захочешь поиграть — меняй ТОЛЬКО 6 строк ниже (--bg, --surface-*, три
+         --accent*), остальное (--accent-soft и т.п.) подстроится через rgba.
+       ===================================================================== */
+    :root {
+      /* ── Палитра «Крем + Чернила + Хвоя + Терракот» ── */
+      --bg:               #F7F4EF;  /* тёплый кремовый «бумажный» фон */
+      --surface:          #FFFFFF;  /* карточки — чистый белый, «парят» над кремом */
+      --surface-2:        #F0EBE2;  /* приподнятый фон (фильтр-панель, KPI-hover) — песочный */
+      --surface-hover:    #FBF8F3;  /* лёгкий тёплый ховер */
+      --surface-sunken:   #EAE3D8;  /* углубление (чуть темнее песка) */
+      --border:           rgba(60, 50, 40, 0.12);   /* тёплая граница (коричневатая, не серая) */
+      --border-strong:    rgba(60, 50, 40, 0.22);
+      --split-line:       rgba(60, 50, 40, 0.07);
+      --text:             #2B2A28;  /* тёплый графит — основной текст (чёрный с теплом) */
+      --text-secondary:   #6B6155;  /* приглушённый коричнево-серый */
+      --text-muted:       #9A9082;  /* тёплый муар */
+      --accent:           #3A4A63;  /* чернила/индиго — primary (структурный, текст/тёмные элементы) */
+      --accent-secondary: #C2734A;  /* (тоже ОЧЕНЬ КРАСИВЫЙ #748b5e)  ТЕРРАКОТ — главный «живой» акцент (вкладки, KPI-иконки, линии подписей) */
+      --accent-tertiary:  #889966;  /* шалфей/олива — мягкий зелёный контрапункт (в графиках) */
+      --accent-quaternary:#8A7B6B;  /* тёплый камень */
+      --accent-soft:      rgba(58, 74, 99, 0.09);    /* подложка primary (чернила, мягко) */
+      --accent-2-soft:    rgba(194, 115, 74, 0.13);  /* подложка терракота (под secondary) */
+      --accent-3-soft:    rgba(136, 153, 102, 0.14);  /* подложка шалфея (под tertiary) */
+      --positive:         #3E7C6A;  /* хвоя = «хорошо» (в одной гамме с акцентом) */
+      --negative:         #C25A4A;  /* приглушённый кирпично-красный */
+      --warning:          #D9A23F;  /* охра */
+
+      /* ── Тонкая тень-иерархия (ТЁПЛАЯ — отбрасывает коричневатую, не серо-синюю) ── */
+      --shadow-xs: 0 1px 2px rgba(60, 50, 40, 0.05);
+      --shadow-sm: 0 1px 2px rgba(60, 50, 40, 0.05), 0 2px 8px rgba(60, 50, 40, 0.07);
+      --shadow-md: 0 6px 18px rgba(60, 50, 40, 0.10);
+      --shadow-lg: 0 20px 48px rgba(60, 50, 40, 0.16);
+
+      /* ── Геометрия ── */
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 22px;
+
+      /* ── Анимация ── */
+      --transition-fast: 120ms cubic-bezier(.4, 0, .2, 1);
+      --transition-base: 220ms cubic-bezier(.4, 0, .2, 1);
+      --transition-slow: 380ms cubic-bezier(.4, 0, .2, 1);
+
+      /* ── Tooltip ECharts (читается из JS) ── */
+      --tooltip-bg:     rgba(43, 42, 40, 0.97);   /* тёплый тёмный графит (не сине-чёрный) */
+      --tooltip-border: rgba(62, 124, 106, 0.50); /* хвоя — рамка подсказки */
+      --tooltip-text:   #F5F1EA;                  /* тёплый светлый текст */
+
+      /* ── Старые алиасы для совместимости с существующим CSS ── */
+      --color-primary:        var(--accent);
+      --color-primary-soft:   var(--accent-soft);
+      --color-accent:         var(--accent-secondary);
+      --color-warning:        var(--warning);
+      --color-danger:         var(--negative);
+      --bg-page:              var(--bg);
+      --bg-card:              var(--surface);
+      --bg-elevated:          var(--surface-2);
+      --border-subtle:        var(--border);
+      --text-primary:         var(--text);
+
+      /* ── Tabler-переменные ── */
+      --tblr-primary:          var(--accent);
+      --tblr-primary-rgb:      58, 74, 99;   /* = --accent (#3A4A63) в RGB, для Tabler-компонентов */
+      --tblr-body-bg:          var(--bg);
+      --tblr-body-color:       var(--text);
+      --tblr-border-color:     var(--border);
+      --tblr-card-bg:          var(--surface);
+      --tblr-font-sans-serif:  'Inter', -apple-system, system-ui, sans-serif;
+      --tblr-border-radius:    var(--radius-md);
+    }
+
+    /* =====================================================================
+       1b. ТЁМНАЯ ТЕМА — midnight + светлый navy + брасс
+       Поддерживается двойной активатор: data-bs-theme + .theme-dark.
+       ===================================================================== */
+    [data-bs-theme="dark"],
+    .theme-dark {
+      /* Тёмная тема в той же ТЁПЛОЙ гамме: не сине-полуночный, а кофейно-графитовый
+         (как тёмное дерево/кожа в архиве). Акценты осветлены, чтобы читались на тёмном. */
+      --bg:               #1C1A17;  /* глубокий кофейно-графитовый */
+      --surface:          #26231F;  /* приподнятый тёплый графит */
+      --surface-2:        #2F2B26;
+      --surface-hover:    #36312B;
+      --surface-sunken:   #181613;
+      --border:           rgba(245, 240, 230, 0.08);
+      --border-strong:    rgba(245, 240, 230, 0.16);
+      --split-line:       rgba(245, 240, 230, 0.06);
+      --text:             #F0EBE2;  /* тёплый кремовый текст */
+      --text-secondary:   #B6AC9C;
+      --text-muted:       #837A6B;
+      --accent:           #8FA6C4;  /* осветлённые чернила/индиго — читается на тёмном */
+      --accent-secondary: #E0976B;  /* ТЕРРАКОТ светлее — главный акцент на тёмном */
+      --accent-tertiary:  #A9BA84;  /* шалфей светлее */
+      --accent-quaternary:#B6AC9C;
+      --accent-soft:      rgba(143, 166, 196, 0.16);
+      --accent-2-soft:    rgba(224, 151, 107, 0.18);   /* подложка терракота */
+      --accent-3-soft:    rgba(169, 186, 132, 0.18);   /* подложка шалфея */
+      --positive:         #6FBFA6;
+      --negative:         #E58D7B;
+      --warning:          #E8C06A;
+
+      --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.28);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.32), 0 2px 8px rgba(0, 0, 0, 0.28);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.42);
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+
+      --tooltip-bg:     rgba(24, 22, 19, 0.97);
+      --tooltip-border: rgba(111, 191, 166, 0.50);
+      --tooltip-text:   #F0EBE2;
+
+      --tblr-primary-rgb: 143, 166, 196;   /* = --accent тёмной темы */
+    }
+
+    /* =====================================================================
+       2. ТИПОГРАФИКА — Manrope (display) + Inter (body)
+       ===================================================================== */
+    /* Базовый шрифт 87.5% = 14px (вместо дефолтных 16px). Это «density-пасс»: все размеры
+       на rem (текст, KPI-числа, отступы Bootstrap) уменьшаются на ~12.5% разом и одинаково
+       на любом экране. Так делают компактные продакшн-дашборды (Grafana/Tabler ≈ 13–14px) —
+       вместо ручного зума 80% в браузере. Высоты графиков заданы в px, их ужимаем отдельно. */
+    html { font-size: 87.5%; scroll-behavior: smooth; }   /* 14px база + плавная прокрутка по якорям */
+    /* body — стили для всей видимой страницы (тег <body> ниже). Свойства: */
+    body {
+      font-family: var(--tblr-font-sans-serif);    /* шрифт текста (var = берём из переменной выше) */
+      /* ФОН СТРАНИЦЫ — ЕДИНЫЙ «лист» с плавной растяжкой по всей высоте (под все графики).
+         Слои (сверху вниз в коде = сверху по приоритету отрисовки):
+           1-2) два мягких тёплых пятна вверху (охра справа, хвоя слева) — «живой свет»;
+           3)   ВЕРТИКАЛЬНЫЙ градиент во всю страницу: чуть теплее/светлее сверху →
+                чуть глубже книзу. Это и даёт ощущение «растянутого листа» за карточками.
+         background-attachment:fixed — градиент привязан к окну, тянется плавно при прокрутке,
+         без «швов» между секциями (полоска-разделитель фильтров тоже убрана). */
+      background:
+        radial-gradient(60% 45% at 85% -5%,  rgba(194, 115, 74, 0.06), transparent 70%),
+        radial-gradient(55% 40% at 5% 0%,    rgba(136, 153, 102, 0.05), transparent 70%),
+        linear-gradient(180deg, #FBF8F3 0%, var(--bg) 42%, #F2ECE2 100%);
+      background-attachment: fixed;
+      background-size: cover;
+      color: var(--text);                           /* цвет текста */
+      font-feature-settings: 'tnum' 1, 'ss01' 1, 'cv11' 1;  /* тонкие настройки шрифта (ровные цифры) */
+      -webkit-font-smoothing: antialiased;          /* сглаживание букв (чётче) */
+      -moz-osx-font-smoothing: grayscale;
+      transition: background var(--transition-base), color var(--transition-base);  /* плавная смена цвета при переключении темы */
+    }
+    /* Тёмная тема: свой вертикальный градиент-«лист» (кофейно-графитовый) —
+       светлее сверху → глубже книзу, в той же логике, что и светлая. */
+    [data-bs-theme="dark"] body, .theme-dark body {
+      background:
+        radial-gradient(60% 45% at 85% -5%,  rgba(224, 151, 107, 0.07), transparent 70%),
+        radial-gradient(55% 40% at 5% 0%,    rgba(169, 186, 132, 0.06), transparent 70%),
+        linear-gradient(180deg, #221F1B 0%, var(--bg) 42%, #161310 100%);
+      background-attachment: fixed;
+      background-size: cover;
+    }
+    /* Контейнер 1440px — оптимум для аналитики: на 1920 приятные поля,
+       на 1366 разворачивается на всю ширину (см. медиа ниже). Графики не размазаны. */
+    /* .container-xl — точка перед именем значит «класс». В HTML пишут class="container-xl",
+       и эти стили применятся к такому элементу. max-width = макс. ширина. !important =
+       «приоритет важнее», перебивает стили Tabler. min(...) выбирает меньшее из двух. */
+    .container-xl { max-width: min(1440px, 100% - 32px) !important; }
+    /* @media — «правило экрана»: стили внутри применяются ТОЛЬКО когда условие верно.
+       Широкий ПК (>1600px) сохраняет кэп 1440px из правила выше — там 1440px красиво
+       центрируется. Ноутбуки же обычно 1536px (1920 при масштабе Windows 125%), 1366 или
+       1280 — при кэпе 1440px у них оставались поля всего ~48px и контент «расползался» почти
+       на всю ширину. Поэтому до 1600px включительно держим умеренный кэп 1200px по центру:
+       контент не разъезжается, поля симметричные. */
+    @media (max-width: 1600px) { .container-xl { max-width: 1200px !important; padding-left: 20px; padding-right: 20px; } }
+    /* Перечисление через запятую = «применить ко ВСЕМ этим селекторам сразу» */
+    h1, h2, h3, h4, .app-title, .card-title, .kpi-value {
+      font-family: 'Manrope', 'Inter', system-ui, sans-serif;  /* список шрифтов: если первого нет — берётся следующий */
+      letter-spacing: -0.01em;                     /* межбуквенный интервал (em = доля размера шрифта) */
+    }
+    .kpi-value, .num { font-variant-numeric: tabular-nums; }  /* цифры одинаковой ширины (не «прыгают») */
+
+    /* Skip-link для клавиатуры/screen-reader (a11y) */
+    .skip-link {
+      position: absolute; top: -40px; left: 12px;
+      background: var(--accent); color: #fff;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-weight: 600; font-size: .85rem; z-index: 999;
+      transition: top var(--transition-base);
+    }
+    /* :focus — псевдокласс (состояние). Стиль применяется, когда на элемент попал фокус
+       (например, перешли по Tab). Бывают ещё :hover (навели мышь), :active (нажали). */
+    .skip-link:focus { top: 12px; }
+
+    /* * = «любой элемент». :focus-visible — фокус с клавиатуры. outline — обводка вокруг. */
+    *:focus-visible {
+      outline: 2px solid var(--accent-secondary);
+      outline-offset: 2px;
+      border-radius: 4px;                          /* скругление углов */
+    }
+
+    /* =====================================================================
+       3. ШАПКА — двойной брендинг + статус-пилюля + viz-menu
+       ===================================================================== */
+    .app-header {
+      position: relative; z-index: 600;            /* «точка отсчёта» для детей + поднимаем шапку НАД карточками графиков (иначе меню «три точки» проваливается под них) */
+      background:                                   /* фон-градиент (плавный переход цветов), декоративный */
+        radial-gradient(120% 100% at 0% 0%, var(--accent-2-soft), transparent 60%),
+        linear-gradient(180deg, var(--surface) 0%, var(--surface) 78%, transparent 100%);
+      border-bottom: 1px solid var(--border);       /* линия снизу: толщина, тип, цвет */
+    }
+    /* ::before — «псевдоэлемент»: добавляет декоративный кусочек ДО содержимого, без отдельного тега в HTML.
+       position:absolute — элемент вырывается из потока и позиционируется по краям родителя (left/right/bottom). */
+    .app-header::before {
+      /* тонкая брассовая нить под заголовком (читается как ленточка) */
+      content: ''; position: absolute; left: 0; right: 0; bottom: 28px; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent-secondary) 30%, var(--accent-secondary) 70%, transparent 100%);
+      opacity: 0.4;
+    }
+    /* display:flex — «гибкий ряд»: дочерние элементы выстраиваются в линию.
+       align-items:center — выровнять по центру по вертикали. gap — промежуток между ними. */
+    .brand-row { display: flex; align-items: center; gap: 16px; }
+    .app-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .82rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .14em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .app-eyebrow .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent-secondary);
+      box-shadow: 0 0 0 3px var(--accent-2-soft);
+    }
+    [data-bs-theme="dark"] .app-eyebrow { color: var(--accent-secondary); }
+    .app-title {
+      font-size: 1.85rem; font-weight: 800; margin: 0;
+      line-height: 1.15; color: var(--text); letter-spacing: -0.02em;
+    }
+    .app-subtitle { font-size: .92rem; color: var(--text-secondary); margin-top: 4px; }
+
+    .app-logo {
+      width: 52px; height: 52px; display: grid; place-items: center;
+      background: linear-gradient(160deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 78%, #000) 100%);
+      color: var(--accent-secondary);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(201, 168, 106, 0.25);
+      transition: transform var(--transition-base);
+    }
+    .app-logo:hover { transform: rotate(-4deg) scale(1.04); }
+
+    /* Статус-пилюля — "Данные обновлены" с лёгким пульсом */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 8px 14px 8px 12px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: .88rem; color: var(--text-secondary); font-weight: 500;
+      white-space: nowrap; box-shadow: var(--shadow-xs);
+    }
+    .status-pill .pulse {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--positive); position: relative;
+    }
+    .status-pill .pulse::after {
+      content: ''; position: absolute; inset: -4px; border-radius: 50%;
+      border: 2px solid var(--positive); opacity: 0.5;
+      animation: pulseRing 2.2s ease-out infinite;
+    }
+    /* @keyframes — описание анимации: что происходит от начала (0%) до конца (100%).
+       Тут кружок растёт (scale) и растворяется (opacity→0) — эффект «пульса». */
+    @keyframes pulseRing {
+      0% { transform: scale(.6); opacity: .6; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    /* Кнопка-призрак */
+    .btn-ghost {
+      background: transparent; color: var(--text-secondary);
+      border: 1px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    .btn-ghost:hover {
+      background: var(--accent-soft); color: var(--accent);
+      border-color: var(--border);
+    }
+    [data-bs-theme="dark"] .btn-ghost:hover { color: var(--accent-secondary); }
+
+    /* =====================================================================
+       4. СИЛУЭТ ГОРОДА (декоративная лента под шапкой)
+       Цвет берётся из --accent — автоматически адаптируется к теме.
+       ===================================================================== */
+    .city-silhouette {
+      height: 32px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='xMidYEnd slice'><path fill='%23C2734A' fill-opacity='0.16' d='M0 60 L0 40 L40 40 L40 20 L60 20 L60 35 L100 35 L100 25 L130 25 L130 10 L145 10 L145 25 L180 25 L180 38 L220 38 L220 22 L250 22 L250 5 L255 5 L255 22 L290 22 L290 35 L330 35 L330 28 L370 28 L370 18 L390 12 L410 18 L410 30 L450 30 L450 22 L490 22 L490 36 L530 36 L530 26 L570 26 L570 8 L580 4 L590 8 L590 26 L630 26 L630 35 L670 35 L670 24 L710 24 L710 32 L750 32 L750 18 L790 18 L790 28 L830 28 L830 22 L860 22 L860 12 L870 8 L880 12 L880 22 L920 22 L920 32 L960 32 L960 26 L1000 26 L1000 36 L1040 36 L1040 24 L1080 24 L1080 18 L1120 18 L1120 30 L1160 30 L1160 38 L1200 38 L1200 60 Z'/></svg>");
+      background-repeat: repeat-x;
+      background-position: bottom center;
+    }
+    [data-bs-theme="dark"] .city-silhouette {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 60' preserveAspectRatio='xMidYEnd slice'><path fill='%236FBFA6' fill-opacity='0.22' d='M0 60 L0 40 L40 40 L40 20 L60 20 L60 35 L100 35 L100 25 L130 25 L130 10 L145 10 L145 25 L180 25 L180 38 L220 38 L220 22 L250 22 L250 5 L255 5 L255 22 L290 22 L290 35 L330 35 L330 28 L370 28 L370 18 L390 12 L410 18 L410 30 L450 30 L450 22 L490 22 L490 36 L530 36 L530 26 L570 26 L570 8 L580 4 L590 8 L590 26 L630 26 L630 35 L670 35 L670 24 L710 24 L710 32 L750 32 L750 18 L790 18 L790 28 L830 28 L830 22 L860 22 L860 12 L870 8 L880 12 L880 22 L920 22 L920 32 L960 32 L960 26 L1000 26 L1000 36 L1040 36 L1040 24 L1080 24 L1080 18 L1120 18 L1120 30 L1160 30 L1160 38 L1200 38 L1200 60 Z'/></svg>");
+    }
+
+    /* =====================================================================
+       5. ПАНЕЛЬ ФИЛЬТРОВ (откреплена — прокручивается вместе со страницей)
+       Было position:sticky → панель «ехала» за скроллом. По просьбе откреплено.
+       Чтобы вернуть липкость — поставь position:sticky; top:0; z-index:100.
+       ===================================================================== */
+    .filters-panel {
+      /* position:relative + высокий z-index поднимают панель (и её выпадающие
+         списки Choices) НАД карточками KPI/графиками. Карточки создают свой
+         stacking context из-за animation/transform (fadeUp), поэтому без этого
+         dropdown проваливался под них. */
+      position: relative; z-index: 500;
+      /* Панель ПРОЗРАЧНА и БЕЗ разделителя снизу — сливается со страницей, чтобы сквозь неё
+         «протекал» единый градиент фона (см. body). Полоска-граница убрана по просьбе.
+         Поля-вводы остаются белыми и сами выделяются на фоне. */
+      background: transparent;
+    }
+    /* flex-wrap:wrap — разрешить перенос на новую строку, если не помещается (важно для адаптива) */
+    .filter-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; }
+    .filter-label {
+      font-size: .78rem; font-weight: 700; color: var(--text-secondary);
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-bottom: 7px; text-transform: uppercase; letter-spacing: .1em;  /* ВСЕ БУКВЫ ЗАГЛАВНЫЕ + разрядка */
+    }
+    /* flex-direction:column — выстроить детей в столбик (а не в ряд).
+       flex: 1 1 240px — «расти и сжимайся, базовая ширина 240px» (резиновая колонка). */
+    .filter-cell { display: flex; flex-direction: column; min-width: 240px; flex: 1 1 240px; }
+    .filter-cell-search { flex: 1 1 360px; min-width: 280px; }
+    .filter-row-active {
+      padding: 10px 14px; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .active-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
+    .active-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px 4px 11px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      font-size: .76rem; font-weight: 600;
+      border: 1px solid var(--border);
+    }
+    [data-bs-theme="dark"] .active-chip { color: var(--accent-secondary); background: var(--accent-2-soft); }
+
+    /* =====================================================================
+       6. KPI — единый дизайн карточек + прогрессивный градиент по позиции
+       --card-accent задаётся inline (см. d2RenderKPI). Все 4 карточки
+       идентичны по структуре; меняется лишь акцентный hue, плавно
+       перетекающий: сталь-синь → синь-тиал → светлая сталь → бирюза.
+       ===================================================================== */
+    /* .kpi-card — стиль одной KPI-карточки (их 4: Учреждений/Школьников/...). Все одинаковы,
+       меняется только акцентный цвет --card-accent (задаётся из JS, см. d2RenderKPI). */
+    .kpi-card {
+      --card-accent: var(--accent);                /* локальная переменная-цвет, перезапишется из JS */
+      position: relative; overflow: hidden;         /* overflow:hidden — прячет всё, что вылезает за углы */
+      background:
+        radial-gradient(140% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 16%, transparent), transparent 58%),
+        var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 22px 24px; display: flex; align-items: center; gap: 18px;
+      box-shadow: var(--shadow-xs);
+      transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+    }
+    .kpi-card::before {
+      /* верхняя нить-акцент — цвет тянется из --card-accent */
+      content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--card-accent) 50%, transparent 100%);
+      opacity: 0.95;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: color-mix(in srgb, var(--card-accent) 35%, var(--border));
+    }
+    /* Иконка наследует акцент карточки → визуальная связь со стрипом сверху */
+    .kpi-icon {
+      width: 52px; height: 52px; border-radius: var(--radius-md);   /* density-пасс: было 60×60 */
+      display: grid; place-items: center; font-size: 1.75rem; flex-shrink: 0;
+      background: color-mix(in srgb, var(--card-accent) 14%, transparent);
+      color: var(--card-accent);
+    }
+    [data-bs-theme="dark"] .kpi-icon {
+      background: color-mix(in srgb, var(--card-accent) 22%, transparent);
+    }
+
+    .kpi-body { flex: 1; min-width: 0; }
+    .kpi-label {
+      font-size: .8rem; color: var(--text-secondary); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+    }
+    .kpi-value {
+      font-size: 2.5rem; font-weight: 800; color: var(--text);
+      margin-top: 6px; line-height: 1.0; letter-spacing: -0.03em;
+    }
+    .kpi-hint { font-size: .82rem; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+    .kpi-skeleton {
+      height: 84px; border-radius: var(--radius-md);   /* density-пасс: было 96px (под высоту карточки) */
+      background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+      background-size: 200% 100%; animation: shimmer 1.6s infinite;
+      border: 1px solid var(--border);
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* =====================================================================
+       7. КАРТОЧКИ ГРАФИКОВ + ТАБЫ
+       ===================================================================== */
+    .chart-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-md); box-shadow: var(--shadow-xs);
+      transition: box-shadow var(--transition-base), border-color var(--transition-base);
+      height: 100%;
+    }
+    .chart-card:hover { box-shadow: var(--shadow-sm); border-color: var(--border-strong); }
+    .chart-card .card-header {
+      border-bottom: 1px solid var(--border); background: transparent;
+      padding: 22px 26px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;  /* чуть больше «воздуха» (editorial) */
+    }
+    .chart-card .card-title {
+      font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--text);   /* крупнее заголовок секции (editorial-акцент) */
+      display: flex; align-items: center; letter-spacing: -0.022em;
+      font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+    }
+    .chart-card .card-title .ti { color: var(--accent-secondary); font-size: 1.4rem; }
+    .chart-card .card-subtitle { font-size: .82rem; color: var(--text-muted); font-weight: 500; }
+    .chart-card .nav-pills { gap: 4px; }
+    .chart-card .nav-pills .nav-link {
+      padding: 6px 14px; font-size: .86rem; font-weight: 600; color: var(--text-secondary);
+      border-radius: var(--radius-sm); transition: all var(--transition-fast);
+      background: transparent;
+    }
+    .chart-card .nav-pills .nav-link:hover { background: var(--accent-2-soft); color: var(--accent-secondary); }
+    [data-bs-theme="dark"] .chart-card .nav-pills .nav-link:hover { color: var(--accent-secondary); }
+    /* Активная вкладка — ХВОЯ (тёплая), а не чернила-синь: лучше сочетается с тёплой
+       гаммой и с подписями. Раньше была синеватая (--accent) и «выбивалась». */
+    .chart-card .nav-pills .nav-link.active {
+      background: var(--accent-secondary); color: #fff;
+      box-shadow: 0 2px 8px rgba(194, 115, 74, 0.28);   /* тень в цвет терракота */
+    }
+    [data-bs-theme="dark"] .chart-card .nav-pills .nav-link.active {
+      background: var(--accent-secondary); color: #1C1A17;   /* тёмный текст = тёмный фон темы */
+    }
+    .chart-card .card-body { padding: 22px; }
+
+    /* =====================================================================
+       8. КОНТЕЙНЕР ГРАФИКА (минимальная высота для адаптива)
+       ===================================================================== */
+    /* .chart — пустой контейнер, в него JS (ECharts) рисует график. height задаёт высоту области */
+    .chart { width: 100%; height: 400px; min-height: 320px; }   /* density-пасс: было 480/380 */
+    /* ── ЕДИНЫЙ СТИЛЬ ПОДПИСЕЙ/ПОЯСНЕНИЙ НА ГРАФИКАХ (canonical caption) ──
+       РЕКОМЕНДАЦИЯ ДИЗАЙНА: вместо «залитой плашки с цветной рамкой» (выглядит дороже
+       в стиле editorial/тёплый минимализм) — ТИХАЯ подпись: тонкая вертикальная линия
+       слева (цвет хвои) + приглушённый текст, БЕЗ фоновой заливки. Так пояснение не
+       спорит с графиком за внимание. Этот же стиль (.chart-hint) — образец для ВСЕХ
+       подписей: серые заметки (#normNote7 и т.п.) ниже приведены к нему же. */
+    .chart-hint {
+      display: none;                               /* display:none — элемент СКРЫТ (его нет на странице) */
+      font-size: .9rem; color: var(--text-secondary);
+      background: transparent;                      /* заливку убрали — чище */
+      border-left: 2px solid var(--accent-secondary);  /* тонкая хвойная линия слева */
+      padding: 2px 0 2px 14px;                      /* отступ только слева (под линию) */
+      margin-bottom: 18px; line-height: 1.55;
+    }
+    /* Добавили класс .active (из JS) → display:block делает подсказку ВИДИМОЙ */
+    .chart-hint.active { display: block; animation: fadeUp 300ms ease both; }
+
+    /* Серые инлайн-заметки под фильтрами (норматив, пояснение coverage и т.п.) —
+       приводим к тому же «тихому» виду: тонкая линия слева + приглушённый текст. */
+    .chart-note {
+      font-size: .85rem; color: var(--text-muted); line-height: 1.55;
+      border-left: 2px solid var(--border-strong);
+      padding: 2px 0 2px 14px; margin-bottom: 16px;
+    }
+
+    /* локальный селектор года в блоке "Контингент" */
+    .contingent-year {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 999px;
+      color: var(--text-secondary); font-size: .8rem;
+    }
+    .contingent-year .ti { font-size: .95rem; color: var(--accent-secondary); }
+    .contingent-year select {
+      border: 0; background: transparent; color: var(--text);
+      font-size: .82rem; font-weight: 700; font-family: inherit;
+      padding: 0 2px; cursor: pointer; outline: none;
+    }
+
+    /* блок Б1 — горизонтальный segmented control "Все / Школа / Сад" над графиком */
+    .b1-wrapper { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+    .b1-toggle {
+      display: inline-flex; padding: 4px; align-self: flex-start;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-md); gap: 2px;
+    }
+    .b1-btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 10px 18px; border-radius: var(--radius-sm);
+      background: transparent; border: 1px solid transparent;
+      color: var(--text-secondary); font-size: .92rem; font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-family: inherit;
+    }
+    .b1-btn:hover { color: var(--text); background: var(--surface); }
+    /* Активная кнопка «Все/Школа/Сад» — ТЕРРАКОТ (как все остальные активные вкладки).
+       Раньше была --accent (чернила-синь) и «выбивалась» синим. */
+    .b1-btn.active {
+      background: var(--accent-secondary); border-color: var(--accent-secondary); color: #fff;
+      box-shadow: 0 1px 4px rgba(194, 115, 74, 0.28);   /* тень в цвет терракота */
+    }
+    [data-bs-theme="dark"] .b1-btn.active {
+      background: var(--accent-secondary); border-color: var(--accent-secondary); color: #1C1A17;
+    }
+    .b1-btn .ti { font-size: 1rem; }
+    .b1-chart { flex: 1 1 auto; min-width: 0; }
+
+    /* =====================================================================
+       9. CHOICES.JS — кастомизация под бренд
+       ===================================================================== */
+    .choices { margin-bottom: 0; font-family: inherit; }
+    /* Одинаковая высота (48px) и стиль для всех полей-фильтров */
+    .choices__inner {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      min-height: 48px !important; font-size: .95rem;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      color: var(--text);
+      align-items: center;
+    }
+    .choices.is-focused .choices__inner,
+    .choices.is-open .choices__inner {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    /* Контраст плейсхолдера — раньше был еле виден */
+    .choices__placeholder { opacity: 1 !important; color: var(--text-secondary) !important; font-weight: 500; }
+    .choices__list--dropdown, .choices__list[aria-expanded] {
+      border-radius: var(--radius-sm); box-shadow: var(--shadow-md);
+      border-color: var(--border);
+      background: var(--surface);
+      font-size: .92rem;
+      /* Высокий z-index, чтобы список фильтра был ПОВЕРХ графиков ECharts,
+         а не уходил под них. position:absolute обязателен для работы z-index. */
+      z-index: 1000; position: absolute;
+    }
+    /* Открытый Choices поднимаем над соседними карточками/графиками */
+    .choices.is-open { z-index: 1000; position: relative; }
+    .choices__list--dropdown .choices__item, .choices__list[aria-expanded] .choices__item { color: var(--text); padding: 10px 14px; }
+    .choices__item--selectable.is-highlighted { background: var(--accent-soft); color: var(--accent); }
+    [data-bs-theme="dark"] .choices__item--selectable.is-highlighted { color: var(--accent-secondary); }
+    .choices__list--multiple .choices__item {
+      background: var(--accent); border: 0; border-radius: 999px;
+      font-size: .82rem; padding: 4px 12px; font-weight: 600; margin: 2px 4px 2px 0;
+    }
+    [data-bs-theme="dark"] .choices__list--multiple .choices__item { background: var(--accent-secondary); color: #1C1A17; }
+    .choices__input { background: transparent; color: var(--text); font-size: .92rem; }
+
+    /* =====================================================================
+       10. АНИМАЦИИ
+       ===================================================================== */
+    /* fill-mode: backwards (а НЕ both) — после анимации transform снимается,
+       карточка перестаёт создавать stacking context, и выпадающий список фильтра
+       (z-index:500 на .filters-panel) корректно ложится поверх карточек. */
+    /* KPI-карточки появляются сразу при загрузке (они в первом экране) — лесенкой. */
+    .kpi-card { animation: fadeUp 500ms cubic-bezier(.4, 0, .2, 1) backwards; }
+    .kpi-card:nth-child(1) { animation-delay: 0ms; }
+    .kpi-card:nth-child(2) { animation-delay: 60ms; }
+    .kpi-card:nth-child(3) { animation-delay: 120ms; }
+    .kpi-card:nth-child(4) { animation-delay: 180ms; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── СДЕРЖАННОЕ «ПОЯВЛЕНИЕ ПРИ ПРОКРУТКЕ» (reveal-on-scroll) ──
+       Блоки графиков не анимируются все разом на загрузке, а МЯГКО проявляются,
+       когда доезжают до экрана. Это «дизайнерский» приём (не «ИИ-блёстки»):
+       класс .reveal вешает JS на карточки; пока блок не виден — он чуть ниже и
+       прозрачнее; когда попал в видимую область — JS добавляет .is-visible и блок
+       плавно встаёт на место. transform СНИМАЕТСЯ после показа (см. .is-visible) —
+       чтобы не ломать наложение выпадающих списков (как в .kpi-card с backwards). */
+    .chart-card.reveal {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity var(--transition-slow), transform var(--transition-slow);
+      will-change: opacity, transform;
+    }
+    .chart-card.reveal.is-visible { opacity: 1; transform: none; }
+
+    /* a11y: уважение системной настройки */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .status-pill .pulse::after { animation: none; }
+    }
+
+    /* =====================================================================
+       11. АДАПТИВНОСТЬ (mobile-first → 375 / 768 / 1200)
+       ===================================================================== */
+    @media (max-width: 1200px) {
+      .app-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 768px) {
+      .app-title { font-size: 1.15rem; }
+      .app-subtitle { font-size: .72rem; }
+      .app-logo { width: 44px; height: 44px; }
+      .filter-cell { min-width: 100%; }
+      .chart { height: 300px; }
+      .kpi-value { font-size: 1.55rem; }
+      .kpi-card { padding: 16px; gap: 14px; }
+      .chart-card .card-body { padding: 14px; }
+      .chart-card .card-header { padding: 14px 16px; }
+      /* Тепловой карте нужна минимальная ширина — на узких экранах даём гориз. скролл,
+         чтобы метки районов (grid.left:200) и 11 столбцов классов не сжимались в кашу. */
+      #chart7, #chart7city { min-width: 680px; }
+      .nap-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      body { overflow-x: hidden; }
+    }
+    @media (max-width: 375px) {
+      .app-title { font-size: 1rem; }
+      .kpi-value { font-size: 1.4rem; }
+      .status-pill { display: none; }
+    }
+
+    /* =====================================================================
+       12. БЛОК НАПОЛНЯЕМОСТИ — segmented control и нотации
+       (перенесён из napolnyaemost.html, стилизован под бренд)
+
+       ИЗМЕНЕНИЕ ДИЗАЙНА: раньше группы кнопок (Год/Уровень/Метрика/Шкала) были
+       «голые» — кнопки висели прямо на фоне, без рамки → выглядели скупо. Теперь
+       они помещены в «таблетку» (segmented control): общий контейнер с песочным
+       фоном, рамкой и скруглением. Активная кнопка «вдавлена» белой плашкой с
+       тенью — как тумблер. То же сделано для главных вкладок .nap-tabs.
+       ===================================================================== */
+    /* Главные вкладки режима (Сводка / ИОГВ по годам / …) — таблетка-контейнер */
+    .nap-tabs {
+      display: inline-flex; padding: 5px; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      gap: 3px; margin-bottom: 24px; flex-wrap: wrap;
+      box-shadow: var(--shadow-xs), inset 0 1px 1px rgba(60, 50, 40, 0.04);  /* лёгкая «вдавленность» контейнера */
+    }
+    .nap-tab {
+      padding: 10px 22px; border-radius: var(--radius-md);
+      border: 1px solid transparent; background: transparent;
+      font-family: inherit; font-size: .95rem; font-weight: 600;
+      cursor: pointer; color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+    .nap-tab:hover { color: var(--text); background: var(--surface-hover); }
+    /* Активная вкладка — «вдавленная» плашка ТЕРРАКОТА (главный тёплый акцент) */
+    .nap-tab.active-tab {
+      background: var(--accent-secondary); border-color: var(--accent-secondary); color: #fff;
+      box-shadow: 0 2px 6px rgba(194, 115, 74, 0.28);
+    }
+    [data-bs-theme="dark"] .nap-tab.active-tab { background: var(--accent-secondary); border-color: var(--accent-secondary); color: #1C1A17; }
+
+    /* ── ОБРАМЛЕНИЕ ГРУПП ВТОРИЧНЫХ ФИЛЬТРОВ (Год/Уровень/Метрика/Шкала) ──
+       Эти 4 группы кнопок раньше «плавали» по фону. Заворачиваем их в такую же
+       таблетку, как .nap-tabs. Селекторы по id групп (см. HTML ниже).
+       Активная кнопка внутри — БЕЛАЯ плашка с тенью (вариант «light»), чтобы
+       вторичные переключатели не спорили цветом с главными вкладками. */
+    #yearBtns7, #typeBtns7, #metricBtns7, #scaleBtns7 {
+      display: inline-flex !important; padding: 4px; gap: 3px !important;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: inset 0 1px 1px rgba(60, 50, 40, 0.04);
+    }
+    /* Кнопки внутри этих групп используют класс .nap-tab — переопределяем активную:
+       вместо тёмной чернильной плашки — светлая белая «вдавленная» (тоньше визуально). */
+    #yearBtns7 .nap-tab.active-tab,
+    #typeBtns7 .nap-tab.active-tab,
+    #metricBtns7 .nap-tab.active-tab,
+    #scaleBtns7 .nap-tab.active-tab {
+      background: var(--surface); border-color: var(--border);
+      color: var(--accent); box-shadow: var(--shadow-sm);
+    }
+    [data-bs-theme="dark"] #yearBtns7 .nap-tab.active-tab,
+    [data-bs-theme="dark"] #typeBtns7 .nap-tab.active-tab,
+    [data-bs-theme="dark"] #metricBtns7 .nap-tab.active-tab,
+    [data-bs-theme="dark"] #scaleBtns7 .nap-tab.active-tab {
+      background: var(--surface); color: var(--accent-secondary);
+    }
+    /* Вторичные кнопки чуть компактнее главных вкладок */
+    #yearBtns7 .nap-tab, #typeBtns7 .nap-tab, #metricBtns7 .nap-tab, #scaleBtns7 .nap-tab {
+      padding: 8px 16px; font-size: .9rem; border-radius: var(--radius-sm);
+    }
+
+    /* Группы фильтров наполняемости (с подписями) */
+    .nap-filter-group { display: flex; flex-direction: column; gap: 8px; }
+    .nap-filter-label { font-size: .78rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+    /* Выпадающий список ИОГВ «Сводки» (Choices.js): показываем ~5 пунктов, остальное скроллом.
+       ~5 × 48px ≈ 240px. Ширину равняем на фильтр (min-width 280px). */
+    /* Фиксированная ширина select'ов ИОГВ: иначе длинное название раздвигает
+       поле и толкает соседние фильтры (они «прыгают» под строку или вправо).
+       width фиксирован, длинный текст выбранного пункта обрезается многоточием. */
+    #iogvFilter7Wrap .choices, #iogvByWrap .choices { width: 300px; min-width: 300px; max-width: 300px; margin-bottom: 0; }
+    #iogvFilter7Wrap .choices__inner, #iogvByWrap .choices__inner { overflow: hidden; }
+    /* Текст выбранного значения не переносится и обрезается «…» */
+    #iogvFilter7Wrap .choices__list--single .choices__item,
+    #iogvByWrap .choices__list--single .choices__item {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+    }
+    /* Выпадающий список может быть шире поля — чтобы длинные названия читались целиком */
+    #iogvFilter7Wrap .choices__list--dropdown, #iogvByWrap .choices__list--dropdown { min-width: 340px; }
+    #iogvFilter7Wrap .choices__list--dropdown .choices__list,
+    #iogvByWrap .choices__list--dropdown .choices__list { max-height: 240px; overflow-y: auto; }
+    /* Компактные плашки сводки (density-пасс: были padding 20/26, val 2.1rem, min-width 200) */
+    .nap-stat-card {
+      background: var(--surface); padding: 12px 16px;
+      border-radius: var(--radius-md); border: 1px solid var(--border);
+      min-width: 150px; position: relative; overflow: hidden;
+      box-shadow: var(--shadow-xs);
+    }
+    /* Цветная полоска убрана по просьбе — плашки «Сводки» без цвета (нейтральная серая полоска). */
+    .nap-stat-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: var(--border);
+    }
+    .nap-stat-card .label {
+      font-size: .72rem; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: .08em; font-weight: 700;
+    }
+    .nap-stat-card .val {
+      font-size: 1.55rem; font-weight: 800; color: var(--text); margin-top: 4px;
+      line-height: 1.0; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    }
+    .nap-stat-card .hint { font-size: .76rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* =====================================================================
+       13. КНОПКА ТЕМЫ (квадратик свет/тьма в шапке)
+       ===================================================================== */
+    /* .viz-menu-toggle — квадратная кнопка 40×40 в шапке. Раньше открывала меню
+       «три точки» (PNG/печать/тема); теперь это просто переключатель темы. */
+    .viz-menu-toggle {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-secondary); cursor: pointer;
+      display: grid; place-items: center;
+      transition: all var(--transition-fast);
+    }
+    .viz-menu-toggle:hover {
+      color: var(--accent); border-color: var(--border-strong);
+      background: var(--accent-soft);
+    }
+    [data-bs-theme="dark"] .viz-menu-toggle:hover { color: var(--accent-secondary); }
+
+    /* =====================================================================
+       14. ФУТЕР
+       ===================================================================== */
+    .app-footer {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      margin-top: 20px;
+    }
+    .app-footer .footer-meta {
+      font-size: .88rem; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 14px;
+    }
+    .app-footer .footer-meta strong { color: var(--text-secondary); font-weight: 600; }
+
+    /* =====================================================================
+       15. PRINT (визуализация на бумаге без меню/панелей)
+       ===================================================================== */
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      .filters-panel, .viz-menu-toggle, .skip-link, .app-footer { display: none !important; }
+      .chart-card, .kpi-card { page-break-inside: avoid; box-shadow: none !important; border-color: #ccc !important; }
+      .app-header { background: #fff !important; }
+      .chart { height: 320px !important; }
+      a { text-decoration: underline; }
+    }
+  </style>
+</head>
+
+<body>
+<!-- ↑ <body> — ВСЁ ВИДИМОЕ на странице теперь здесь. Что напишем — то и покажется. -->
+
+  <!-- <a> — ссылка. href куда ведёт (#main-content = к элементу с id="main-content" на этой же странице).
+       Эта ссылка для незрячих/клавиатуры: «перепрыгнуть к содержимому». -->
+  <a href="#main-content" class="skip-link">К основному содержимому</a>
+
+  <!-- <header> — смысловой тег «шапка». role="banner" — подсказка для экранных читалок.
+       class="app-header" связывает с CSS-стилями выше. -->
+  <header class="app-header" role="banner">
+    <!-- <div> — самый частый тег, «коробка»-контейнер. Сам по себе ничего не значит,
+         служит для группировки и стилизации. container-xl — центрирует и ограничивает ширину. -->
+    <div class="container-xl">
+      <!-- Классы d-flex, py-4, gap-3 и т.п. — ГОТОВЫЕ стили Tabler (не наши):
+           d-flex=гибкий ряд, justify-content-between=раздвинуть по краям, py-4=отступ сверху/снизу. -->
+      <div class="d-flex align-items-center justify-content-between gap-3 py-4 flex-wrap">
+
+        <!-- Логотип-флюгер + название -->
+        <div class="brand-row">
+          <!-- aria-hidden="true" — скрыть от экранных читалок (это декор, не текст) -->
+          <div class="app-logo" aria-hidden="true">
+            <!-- ЛОГОТИП: «архивный ящик с документами» (замена флюгера) — под «Центр архивных документов».
+                 Рисуется вектором: rect=прямоугольник (лист/ящик), line=линии (строки текста на листе).
+                 Два листа со сдвигом дают «стопку документов»; снизу — корпус ящика-каталога.
+                 currentColor берёт цвет из CSS (.app-logo color), opacity делает задний лист бледнее (глубина). -->
+            <svg viewBox="0 0 40 40" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- задний лист (бледнее, сдвинут) -->
+              <rect x="13" y="5" width="17" height="20" rx="2.5" fill="currentColor" opacity="0.35"/>
+              <!-- передний лист со строками текста -->
+              <rect x="9" y="8" width="17" height="20" rx="2.5" fill="currentColor"/>
+              <line x1="12.5" y1="13" x2="22.5" y2="13" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="12.5" y1="17" x2="22.5" y2="17" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="12.5" y1="21" x2="19"   y2="21" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+              <!-- корпус архивного ящика снизу + ручка -->
+              <path d="M6 30 h28 v3 a3 3 0 0 1 -3 3 H9 a3 3 0 0 1 -3 -3 Z" fill="currentColor"/>
+              <line x1="17" y1="33" x2="23" y2="33" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <!-- <span> — как div, но «строчный» (не переносит строку). Для кусочков текста. -->
+            <div class="app-eyebrow"><span class="dot"></span> ГКУ Центр архивных документов · Санкт-Петербург</div>
+            <!-- <h1> — главный заголовок страницы (он один). h2/h3 — подзаголовки рангом ниже. -->
+            <h1 class="app-title">Дашборд образования Санкт-Петербурга</h1>
+            <div class="app-subtitle">Аналитика по органам исполнительной власти (ИОГВ)</div>
+          </div>
+        </div>
+
+        <!-- Правая колонка: статус данных + viz-menu -->
+        <div class="d-flex align-items-center gap-2">
+          <div class="status-pill" title="Дата актуальности данных">
+            <span class="pulse" aria-hidden="true"></span>
+            <span><strong>Данные:</strong> май 2026</span>
+          </div>
+
+          <!-- Кнопка-квадратик переключения темы (свет ⇄ тьма).
+               Бывшее меню «три точки» (PNG / печать / тема) убрано — оставлена только тема.
+               onclick=cycleTheme() переключает тему; иконку обновляет applyTheme(). -->
+          <button class="viz-menu-toggle" id="themeBtn" type="button" onclick="cycleTheme()"
+                  aria-label="Тёмная тема" title="Тёмная тема">
+            <i class="ti ti-moon-stars" id="themeBtnIcon"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+    <div class="city-silhouette" aria-hidden="true"></div>
+  </header>
+
+  <!-- <main> — главная содержательная область (после шапки). id, чтобы skip-link сюда прыгал. -->
+  <main id="main-content" role="main">
+
+  <!-- <section> — смысловой раздел страницы (логически отдельный кусок). -->
+  <section class="filters-panel" aria-label="Фильтры">
+    <div class="container-xl py-3">
+      <div class="filter-row">
+        <div class="filter-cell filter-cell-search">
+          <!-- <label> — подпись к полю. for="filterIogv" связывает её с <select> того же id
+               (клик по подписи активирует поле). -->
+          <label class="filter-label" for="filterIogv"><i class="ti ti-building-bank me-1"></i>Орган власти (ИОГВ)</label>
+          <!-- <select> — выпадающий список. multiple = можно выбрать несколько. Пустой! —
+               варианты (районы) добавит JS из данных. Потом Choices.js превратит его в красивый с поиском. -->
+          <select id="filterIogv" multiple></select>
+        </div>
+        <div class="filter-cell">
+          <label class="filter-label" for="filterForms"><i class="ti ti-building me-1"></i>Форма собственности</label>
+          <select id="filterForms" multiple></select>
+        </div>
+      </div>
+      <div class="filter-row filter-row-active mt-3" id="activeFiltersRow">
+        <span class="filter-label text-muted" style="margin-bottom:0;">Активно:</span>
+        <div class="active-chips" id="activeFilters"><span class="text-muted small">фильтры не применены</span></div>
+        <button class="btn btn-sm btn-ghost ms-auto" id="resetFilters" type="button">
+          <i class="ti ti-rotate me-1"></i>Сбросить
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ╔═══ 3. KPI (источник: contingent_school/garden, institutions, vacancies)
+        Все 4 карточки идентичны по структуре; --card-accent задаётся inline и
+        плавно перетекает: сталь-синь → синь-тиал → светлая сталь → бирюза. ═══╗ -->
+  <section class="container-xl py-4" aria-label="Ключевые показатели">
+    <!-- Сетка Tabler/Bootstrap: row = строка, col-* = колонка внутри неё (всего 12 колонок в ряд).
+         col-lg-3 = на больших экранах 3/12 ширины (4 в ряд); col-sm-6 = на маленьких 6/12 (2 в ряд).
+         Так получается адаптив без ручного CSS. id="kpiRow" — сюда JS вставит 4 готовые карточки. -->
+    <div class="row g-3 align-items-stretch" id="kpiRow">
+      <!-- kpi-skeleton — серые «заглушки-загрузки», их видно ПОКА грузятся данные.
+           Потом JS заменит содержимое kpiRow на настоящие карточки. -->
+      <div class="col-sm-6 col-lg-3"><div class="kpi-skeleton"></div></div>
+      <div class="col-sm-6 col-lg-3"><div class="kpi-skeleton"></div></div>
+      <div class="col-sm-6 col-lg-3"><div class="kpi-skeleton"></div></div>
+      <div class="col-sm-6 col-lg-3"><div class="kpi-skeleton"></div></div>
+    </div>
+  </section>
+
+  <!-- ╔═══ 4. БЛОКИ ГРАФИКОВ ═══╗ -->
+  <section class="container-xl pb-5" aria-label="Аналитические блоки">
+    <!-- g-4 (вместо g-3) — чуть больше «воздуха» между блоками графиков (editorial-ритм) -->
+    <div class="row g-4">
+
+      <!-- ▒ БЛОК А: Сеть учреждений (источник: institutions.json) ▒
+           СТРУКТУРА КАРТОЧКИ С ТАБАМИ (одинакова у блоков А, Б, и была у В):
+             • card-header — шапка карточки: заголовок + переключатель вкладок (nav-pills)
+             • card-body   — тело: подсказки + tab-content (контент вкладок)
+           Вкладки Tabler работают так: <a href="#tab-a1"> показывает <div id="tab-a1">. -->
+      <!-- col-12 col-lg-6 — на телефоне во всю ширину (12/12), на ПК половина (6/12) → 2 блока в ряд -->
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-building me-2" style="color:var(--accent);"></i>Сеть учреждений</h3>
+            <!-- <ul>/<li> — список (ul=маркированный). Тут это «таблетки»-вкладки.
+                 data-bs-toggle="tab" — атрибут Tabler: клик переключает вкладку. ms-auto — прижать вправо. -->
+            <ul class="nav nav-pills card-header-pills ms-auto" role="tablist">
+              <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-a1" data-chart="a1">По типам</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-a2" data-chart="a2">По районам</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-a3" data-chart="a3">По формам</a></li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <!-- Подсказки под каждую вкладку. data-hint-for — какой вкладке принадлежит (показ управляется из JS). -->
+            <div class="chart-hint" data-hint-for="a1">Распределение учреждений выбранных ИОГВ по типам (ДОУ СОШ СПО)</div>
+            <div class="chart-hint" data-hint-for="a2">Количество учреждений по районам СПб</div>
+            <div class="chart-hint" data-hint-for="a3">Распределение учреждений выбранных ИОГВ по формам собственности</div>
+            <!-- tab-content — обёртка для всех вкладок. Каждая tab-pane = одна вкладка;
+                 у активной класс "show active". Внутри — пустой .chart, куда JS рисует график. -->
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="tab-a1"><div class="chart" id="chart-a1" role="img" aria-label="Учреждения по типам"></div></div>
+              <div class="tab-pane fade" id="tab-a2"><div class="chart" id="chart-a2" role="img" aria-label="Учреждения по районам"></div></div>
+              <div class="tab-pane fade" id="tab-a3"><div class="chart" id="chart-a3" role="img" aria-label="Учреждения по формам собственности"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ▒ БЛОК Б: Контингент (источник: grup_count.json) ▒ -->
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-users me-2" style="color:var(--accent-tertiary);"></i>Контингент</h3>
+            <ul class="nav nav-pills card-header-pills ms-auto" role="tablist">
+              <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-b1" data-chart="b1">Сады и Школы</a></li>
+              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-b3" data-chart="b3">Параллели</a></li>
+            </ul>
+            <div class="contingent-year ms-2">
+              <i class="ti ti-calendar"></i>
+              <select id="contingentYear" aria-label="Год отчёта"></select>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-hint" data-hint-for="b1">Контингент: внешнее кольцо — школьники по уровням, внутреннее — воспитанники садов по возрастам</div>
+            <div class="chart-hint" data-hint-for="b3">Численность обучающихся школ по параллелям 1–11 класс</div>
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="tab-b1">
+                <div class="b1-wrapper">
+                  <!-- Группа кнопок-переключателей. data-mode="..." — СВОЙ атрибут (data-* можно
+                       придумывать любые). JS читает его при клике и понимает, что выбрано (all/school/garden).
+                       Класс active помечает текущую активную кнопку (её красит CSS). -->
+                  <div class="b1-toggle" id="b1Toggle" role="tablist" aria-label="Категория контингента">
+                    <button class="b1-btn active" data-mode="all" type="button"><i class="ti ti-circles"></i> Все</button>
+                    <button class="b1-btn" data-mode="school" type="button"><i class="ti ti-school"></i> Школа</button>
+                    <button class="b1-btn" data-mode="garden" type="button"><i class="ti ti-horse-toy"></i> Сад</button>
+                  </div>
+                  <div class="chart b1-chart" id="chart-b1" role="img" aria-label="Распределение контингента"></div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="tab-b3"><div class="chart" id="chart-b3" role="img" aria-label="Учащиеся по параллелям"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ▒ БЛОК В: Вакансии (источник: vacancies.json) ▒
+           Объединённый вид без вкладок: treemap районов (площадь=объём) + bar
+           топ-должностей. ДВУСТОРОННЯЯ фильтрация по клику:
+             • клик по району в treemap → bar показывает должности этого района
+             • клик по должности в bar → treemap показывает только районы с этой вакансией
+           Кнопка «Сбросить» возвращает общий вид. -->
+      <div class="col-12">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-briefcase me-2" style="color:var(--accent-secondary);"></i>Вакансии
+              <span class="card-subtitle ms-2">по данным «Работа России», май 2026</span></h3>
+          </div>
+          <div class="card-body">
+            <!-- Панель состояния фильтра + сброс -->
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+              <span id="vacState" style="background:var(--surface-2); color:var(--text-secondary); border-radius:8px; padding:6px 14px; font-size:.85rem; font-weight:600;">Все районы и должности</span>
+              <button id="vacReset" type="button" style="padding:6px 14px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-secondary); font:inherit; font-size:.85rem; cursor:pointer;">Сбросить</button>
+              <span style="font-size:.8rem; color:var(--text-muted);">Кликни район в карте слева или должность в списке справа — графики отфильтруют друг друга.</span>
+            </div>
+            <div class="row g-3">
+              <div class="col-12 col-lg-6"><div class="chart" id="chart-v1" style="min-height:380px;" role="img" aria-label="Вакансии по районам"></div></div>
+              <div class="col-12 col-lg-6"><div class="chart" id="chart-v2" style="min-height:380px;" role="img" aria-label="Топ востребованных должностей"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ▒ БЛОК Г: НАПОЛНЯЕМОСТЬ (заменяет пустую заглушку; источник: grup_count + population_education) ▒
+           Независим от главного фильтра ИОГВ — свои кнопки внутри.
+           col-12 (вся ширина): тепловой карте и матрице годов нужно много места,
+           в половинной колонке метки районов и 11 столбцов классов не помещаются. -->
+      <div class="col-12">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="ti ti-temperature me-2" style="color:var(--accent-quaternary);"></i>Наполняемость классов и групп</h3>
+          </div>
+          <div class="card-body">
+
+            <!-- Сегментированные вкладки режима -->
+            <div class="nap-tabs" role="tablist" aria-label="Режим наполняемости">
+              <button id="tab7rose"     class="nap-tab active-tab" data-view="rose"     type="button">Сводка по СПб</button>
+              <button id="tab7heatmap"  class="nap-tab"            data-view="heatmap"  type="button">ИОГВ по годам</button>
+              <button id="tab7byiogv"   class="nap-tab"            data-view="byiogv"   type="button">Год по ИОГВ</button>
+              <button id="tab7coverage" class="nap-tab"            data-view="coverage" type="button">Доля населения в образовании</button>
+            </div>
+
+            <!-- Фильтры розы/heatmap.
+                 style="..." прямо в теге — это «инлайн-стиль» (CSS внутри HTML, для разовых правок).
+                 Группы кнопок ниже: у каждой кнопки свой data-* (data-type/data-metric/data-scale),
+                 JS читает его при клике. Пустые <div id="yearBtns7"> — кнопки годов добавит JS из данных. -->
+            <div id="filters7main" style="display:flex; gap:18px; flex-wrap:wrap; margin-bottom:16px; align-items:flex-start;">
+              <div class="nap-filter-group">
+                <span class="nap-filter-label">Год</span>
+                <div id="yearBtns7" style="display:flex; gap:6px; flex-wrap:wrap;"></div>  <!-- кнопки годов вставит JS -->
+              </div>
+              <div class="nap-filter-group">
+                <span class="nap-filter-label">Уровень</span>
+                <div id="typeBtns7" style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="nap-tab active-tab" data-type="школа" type="button">Школы</button>
+                  <button class="nap-tab" data-type="сад" type="button">Сады</button>
+                </div>
+              </div>
+              <div class="nap-filter-group">
+                <span class="nap-filter-label">Метрика</span>
+                <div id="metricBtns7" style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="nap-tab active-tab" data-metric="avg" type="button">Наполняемость</button>
+                  <button class="nap-tab" data-metric="students" type="button">Контингент</button>
+                  <button class="nap-tab" data-metric="pct" type="button">Доля, %</button>
+                </div>
+              </div>
+              <div class="nap-filter-group" id="scaleBtns7Wrap">
+                <span class="nap-filter-label">Шкала цвета</span>
+                <div id="scaleBtns7" style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="nap-tab active-tab" data-scale="norm" type="button">Норматив*</button>
+                  <button class="nap-tab" data-scale="city" type="button">Среднее по городу</button>
+                </div>
+              </div>
+              <!-- Фильтр ИОГВ «Сводки» (iogvFilter7Wrap) перенесён ниже, в ряд #roseRow7 —
+                   справа от KPI-плашек. -->
+              <!-- Фильтр ИОГВ для вкладки «Год по ИОГВ» (один ИОГВ, динамика по годам) -->
+              <div class="nap-filter-group" id="iogvByWrap" style="display:none;">
+                <span class="nap-filter-label">ИОГВ</span>
+                <select id="iogvSelectBy" style="background:var(--surface); color:var(--text); border:1.5px solid var(--border); padding:12px 16px; border-radius:8px; font-size:.95rem; font-weight:500; cursor:pointer; min-width:280px; min-height:48px; font-family:inherit;"></select>
+              </div>
+            </div>
+
+            <!-- Ряд «Сводки по СПб»: KPI-плашки слева, фильтр ИОГВ справа (виден только в режиме rose).
+                 Плашки заполняет JS (renderRose7); список iogvSelect7 наполняет initIogvFilter.
+                 align-items:flex-start — фильтр прижат к верху, на одном уровне с плашками;
+                 margin-left:auto у фильтра — отталкивает его к правому краю ряда (плашки слева,
+                 фильтр справа, без пустоты — края выровнены). -->
+            <div id="roseRow7" style="display:none; gap:18px; align-items:flex-start; flex-wrap:wrap; margin-bottom:16px;">
+              <div id="stats7" style="display:flex; gap:14px; flex-wrap:wrap;"></div>  <!-- KPI-плашки «Сводки» -->
+              <div class="nap-filter-group" id="iogvFilter7Wrap" style="margin-left:auto; margin-right:80px;">
+                <span class="nap-filter-label">ИОГВ</span>
+                <select id="iogvSelect7" style="background:var(--surface); color:var(--text); border:1.5px solid var(--border); padding:12px 16px; border-radius:8px; font-size:.95rem; font-weight:500; cursor:pointer; min-width:280px; min-height:48px; font-family:inherit;">
+                  <option value="ALL">Все районы (общее по СПб)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Пояснение для вкладки coverage (единый стиль .chart-note: тонкая линия слева) -->
+            <div id="filters7cov" style="display:none;">
+              <div class="chart-note" style="max-width:1100px;">
+                Считается: <b>(школьники + воспитанники ДОУ) ÷ всё население района × 100%</b>.
+                Каждый столбец — год (берутся из файла; 2025 исключён, т.к. население за него ещё не заполнено).
+                Где данных нет — пусто.
+              </div>
+            </div>
+
+            <!-- Сноска про норматив — тот же единый стиль .chart-note -->
+            <div id="normNote7" class="chart-note">
+              * Норматив СанПиН 2.4.3648-20 (25 чел/класс для школ, 22 для садов) формально <b>утратил силу с 2021 г.</b>
+            </div>
+
+            <!-- (KPI-плашки «Сводки» перенесены выше, в #roseRow7 — рядом с фильтром ИОГВ) -->
+
+            <!-- nap-scroll — обёртка с горизонтальной прокруткой (для узких экранов).
+                 chart7 — главная тепловая карта; chart7city — отдельная строка «Санкт-Петербург»;
+                 между ними пунктирный разделитель. Все три рисует JS (ECharts). -->
+            <div class="nap-scroll">
+              <div id="chart7" style="width:100%; height:640px;" role="img" aria-label="Тепловая карта наполняемости"></div>   <!-- density-пасс: было 840px -->
+              <div id="chart7citySep" style="display:none; border-top:2px dashed var(--border); margin:22px 0 8px;"></div>
+              <div id="chart7city" style="width:100%; height:120px; display:none;" role="img" aria-label="Строка по Санкт-Петербургу"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  </main>  <!-- конец главной области -->
+
+
+  <!-- <footer> — «подвал» страницы (низ): источники, дата обновления. -->
+  <footer class="app-footer" role="contentinfo">
+    <div class="container-xl py-3">
+      <div class="footer-meta">
+        <div>
+         <!-- Источники: <strong>Userint</strong> · <strong>ЕГРЮЛ</strong> · <strong>Контур</strong> · <strong>Работа России</strong> -->
+        </div>
+        <div>
+          ГКУ Центр архивных документов СПб · обновлено май 2026
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ╔═══ 6. БИБЛИОТЕКИ (CDN) ═══╗
+       <script src="..."> — подключает ГОТОВЫЙ JavaScript-код (логику) с внешнего сервера.
+       Важно: подключаем ДО нашего кода ниже, иначе наш код не найдёт их функции.
+         • tabler   — поведение вкладок/меню       • echarts — рисование всех графиков
+         • choices  — выпадашки с поиском            • countup — анимация «бегущих» цифр в KPI -->
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/countup.js@2.6.2/dist/countUp.umd.js"></script>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       JS ЧАСТЬ 1 — ГРАФИКИ И KPI ДАШБОРДА (бывшие d2_charts.js + d2_kpi.js)
+       Источники данных подписаны у каждой функции.
+       Все цвета — через TOKENS (читаются из CSS-переменных при рендере),
+       чтобы графики корректно адаптировались к смене темы без перезагрузки.
+       ═══════════════════════════════════════════════════════════════ -->
+  <!-- Этот <script> БЕЗ src — значит код пишем прямо тут. Это «мозг» дашборда (логика). -->
+  <script>
+  /* В JavaScript комментарий — две косые // до конца строки, или /* ... *​/ для блока.
+     БАЗА, пригодится дальше:
+       • let x = 5    — переменная, ЗНАЧЕНИЕ можно менять
+       • const y = 5  — константа, менять нельзя (чаще используют её)
+       • function имя(аргументы) { ... }  — функция (именованный кусок кода, который зовут по имени)
+       • (a, b) => a + b   — «стрелочная» функция, короткая запись. => читается «возвращает»
+       • { ключ: значение }  — объект (набор именованных свойств)
+       • [1, 2, 3]           — массив (список значений) */
+
+  /* ===== ТЕМА-ТОКЕНЫ ДЛЯ ECHARTS =====
+     Цвета графиков перечитываются из CSS на каждом рендере → авто-адаптация к теме (тёмная/светлая). */
+  let TOKENS = {};                                 // объект-копилка цветов (заполнится ниже)
+  let baseTextStyle, baseAxisLabel, CHART_PALETTE; // объявили переменные, значения дадим позже
+  function refreshTokens() {                        // функция: считать актуальные цвета из CSS
+    const cs = getComputedStyle(document.documentElement);  // «вычисленные стили» корня <html>
+    const get = (n, fallback) => (cs.getPropertyValue(n).trim() || fallback);  // достать CSS-переменную; || fallback = «или запасное значение»
+    /* Fallback-значения (после запятой) — на случай, если CSS-переменная не прочиталась.
+       Обновлены под тёплую палитру, чтобы совпадать с :root выше. */
+    TOKENS = {
+      text:          get('--text',             '#2B2A28'),
+      text2:         get('--text-secondary',   '#6B6155'),
+      muted:         get('--text-muted',       '#9A9082'),
+      bg:            get('--bg',               '#F7F4EF'),
+      surface:       get('--surface',          '#FFFFFF'),
+      surface2:      get('--surface-2',        '#F0EBE2'),
+      border:        get('--border',           'rgba(60,50,40,0.12)'),
+      split:         get('--split-line',       'rgba(60,50,40,0.07)'),
+      accent:        get('--accent',           '#3A4A63'),
+      accent2:       get('--accent-secondary', '#3E7C6A'),
+      accent3:       get('--accent-tertiary',  '#C2734A'),
+      accent4:       get('--accent-quaternary','#8A7B6B'),
+      positive:      get('--positive',         '#3E7C6A'),
+      negative:      get('--negative',         '#C25A4A'),
+      warning:       get('--warning',          '#D9A23F'),
+      tooltipBg:     get('--tooltip-bg',       'rgba(43,42,40,0.97)'),
+      tooltipBorder: get('--tooltip-border',   'rgba(62,124,106,0.50)'),
+      tooltipText:   get('--tooltip-text',     '#F5F1EA'),
+    };
+    baseTextStyle = { fontFamily: 'Inter, system-ui, sans-serif', color: TOKENS.text };
+    baseAxisLabel = { ...baseTextStyle, fontSize: 13, color: TOKENS.text2, fontWeight: 500 };
+    /* Палитра графиков (тёплая): чернила → хвоя → терракот → камень → пыльно-синий → охра.
+       Пятый цвет #6E84A6 — приглушённый пыльно-синий: единственный «холодный» тон в наборе,
+       нужен чтобы соседние сегменты колец различались (5+ категорий). */
+    CHART_PALETTE = [TOKENS.accent, TOKENS.accent2, TOKENS.accent3, TOKENS.accent4, '#6E84A6', TOKENS.warning];
+  }
+  refreshTokens();
+
+  /* Общий tooltip-стиль (читает текущую тему) */
+  function ttStyle() {
+    return {
+      backgroundColor: TOKENS.tooltipBg,
+      borderColor:     TOKENS.tooltipBorder,
+      borderWidth:     1,
+      textStyle:       { color: TOKENS.tooltipText, fontSize: 13, fontFamily: 'Inter, sans-serif' },
+      extraCssText:    'box-shadow: 0 8px 24px rgba(0,0,0,0.25); border-radius: 8px; padding: 10px 12px;',
+    };
+  }
+
+  /* ===== ОБЩИЕ ХЕЛПЕРЫ (маленькие функции-помощники, переиспользуются везде) ===== */
+  // fmt(1234567) → "1 234 567" — красивое число с пробелами по-русски
+  const fmt = n => Number(n).toLocaleString('ru-RU');
+  // короткая подпись оси: 1500000 → "1.5 млн", 8200 → "8k"
+  const fmtAxisShort = v => {
+    if (v >= 1e6) return (v/1e6).toFixed(1)+' млн';  // 1e6 = 1 000 000. if = «если ... то вернуть»
+    if (v >= 1e3) return Math.round(v/1e3)+'k';      // + между строкой и числом = склеивание текста
+    return String(v);
+  };
+
+  const _d2charts = {};                              // «словарь» уже созданных графиков (ключ = id контейнера)
+  // getChart: вернуть график для контейнера; если его ещё нет — создать (echarts.init). Чтобы не плодить копии.
+  function getChart(elementId) {
+    const el = document.getElementById(elementId);   // найти HTML-элемент по его id
+    if (!el) return null;                            // нет такого элемента → выходим (вернуть «ничего»)
+    if (!_d2charts[elementId]) _d2charts[elementId] = echarts.init(el, null, { renderer:'canvas' });  // создаём, если ещё не создан
+    return _d2charts[elementId];
+  }
+
+  /* Заглушка «Нет данных» для пустого графика. Рисует надпись по центру и чистит график.
+     msg — текст (напр. «Нет данных за 2021 год»). Возвращает true — удобно для раннего выхода:
+       if (showNoData('chart-b1', !rows.length, 'Нет данных за '+year+' год')) return;
+     Когда данные появятся в JSON — условие станет false и нарисуется обычный график (data-driven). */
+  function showNoData(elementId, isEmpty, msg) {
+    if (!isEmpty) return false;                       // данные есть → ничего не делаем
+    const chart = getChart(elementId); if (!chart) return true;
+    chart.setOption({
+      title: { text: msg, left:'center', top:'middle', textStyle:{ color: TOKENS.muted, fontSize:15, fontFamily:'Manrope, Inter', fontWeight:600 } },
+      tooltip:{ show:false }, xAxis:{ show:false }, yAxis:{ show:false }, visualMap:[], series:[],
+    }, true);
+    return true;                                      // пусто → вызывающий код делает return
+  }
+
+  /* Дирижёр: перерисовать ВСЕ графики А/Б/В разом. filtered = данные после фильтров.
+     Вызывается каждый раз, когда пользователь меняет фильтр. */
+  function d2RenderAllCharts(filtered, allInstitutions, b1Mode='all') {  // b1Mode='all' — значение по умолчанию
+    refreshTokens();                                 // обновить цвета (вдруг сменилась тема)
+    renderA1(filtered); renderA2(allInstitutions); renderA3(filtered);   // блок А (3 вкладки)
+    renderB1(filtered, b1Mode); renderB3(filtered);  // блок Б
+    renderVacancies(filtered);   // блок В: связка treemap+bar с двусторонней фильтрацией
+  }
+  function d2RerenderB1(filtered, b1Mode) { refreshTokens(); renderB1(filtered, b1Mode); }
+  function d2RerenderB3(filtered) { refreshTokens(); renderB3(filtered); }
+
+  /* donut с центральной цифрой */
+  function donutOption({ series, total, colors, totalLabel='всего' }) {
+    return {
+      tooltip: { trigger:'item', ...ttStyle(),
+        formatter: p => `${p.name}<br/><b>${fmt(p.value)}</b> (${p.percent}%)` },
+      legend: { bottom:0, textStyle:{ ...baseTextStyle, color: TOKENS.text2 }, itemWidth:12, itemHeight:12 },
+      color: colors || CHART_PALETTE,
+      series: [{
+        type:'pie', radius:['56%','86%'], avoidLabelOverlap:true,
+        itemStyle:{ borderRadius:8, borderColor: TOKENS.surface, borderWidth:3 },
+        label:{ show:true, position:'outside',
+          formatter: p => `{name|${p.name}}\n{val|${fmt(p.value)}  ·  ${p.percent}%}`,
+          rich:{
+            name:{ fontSize:15, fontWeight:700, color: TOKENS.text, lineHeight:20, fontFamily:'Manrope, Inter' },
+            val: { fontSize:12, color: TOKENS.text2, lineHeight:16, fontFamily:'Inter' }
+          } },
+        labelLine:{ show:true, length:14, length2:16, smooth:true, lineStyle:{ color: TOKENS.text2, width:1.2 } },
+        data: series,
+      }],
+      graphic: [{ type:'group', left:'center', top:'center', children:[
+        { type:'text', top:-22, style:{ text:fmt(total), fontSize:44, fontWeight:800, fill: TOKENS.text, fontFamily:'Manrope, Inter', textAlign:'center' } },
+        { type:'text', top:22,  style:{ text:totalLabel, fontSize:14, fill: TOKENS.text2, fontFamily:'Inter', textAlign:'center', fontWeight:500 } },
+      ]}],
+    };
+  }
+
+  function donutOption_form({ series, total, colors, totalLabel='всего' }) {
+    return {
+      tooltip: { trigger:'item', ...ttStyle(),
+        formatter: p => `${p.name}<br/><b>${fmt(p.value)}</b> (${p.percent}%)` },
+      //legend: { bottom:0, textStyle:{ ...baseTextStyle, color: TOKENS.text2 }, itemWidth:12, itemHeight:12 },
+      color: colors || CHART_PALETTE,
+      series: [{
+        type:'pie', radius:['56%','86%'], avoidLabelOverlap:true,
+        itemStyle:{ borderRadius:8, borderColor: TOKENS.surface, borderWidth:3 },
+        label:{ show:true, position:'outside',
+          formatter: p => `{name|${p.name}}\n{val|${fmt(p.value)}  ·  ${p.percent}%}`,
+          rich:{
+            name:{ fontSize:15, fontWeight:700, color: TOKENS.text, lineHeight:20, fontFamily:'Manrope, Inter' },
+            val: { fontSize:12, color: TOKENS.text2, lineHeight:16, fontFamily:'Inter' }
+          } },
+        labelLine:{ show:true, length:14, length2:16, smooth:true, lineStyle:{ color: TOKENS.text2, width:1.2 } },
+        data: series,
+      }],
+      graphic: [{ type:'group', left:'center', top:'center', children:[
+        { type:'text', top:-22, style:{ text:fmt(total), fontSize:44, fontWeight:800, fill: TOKENS.text, fontFamily:'Manrope, Inter', textAlign:'center' } },
+        { type:'text', top:22,  style:{ text:totalLabel, fontSize:14, fill: TOKENS.text2, fontFamily:'Inter', textAlign:'center', fontWeight:500 } },
+      ]}],
+    };
+  }
+
+  /* ===== БЛОК А — институции (источник: institutions.json) =====
+     ОБЩИЙ ПАТТЕРН всех графиков (запомни — дальше повторяется):
+       1) посчитать данные (сколько чего)  2) превратить в формат ECharts  3) chart.setOption(...) нарисовать.
+     Методы массивов, которые встречаются всюду:
+       • forEach(o => ...)  — пройти каждый элемент o (ничего не возвращает, просто делает)
+       • map(o => ...)      — преобразовать каждый элемент → НОВЫЙ массив
+       • filter(o => условие) — оставить только подходящие элементы
+       • reduce((сумма,x)=>...) — «свернуть» массив в одно значение (напр. в сумму)
+       • sort((a,b)=>a-b)   — отсортировать (a-b = по возрастанию)
+       • Object.entries({Школа:5}) → [['Школа',5]] — объект в список пар [ключ, значение] */
+  function renderA1(data) {           // «бублик» (donut) по типам учреждений (ДОУ/СОШ/СПО)
+    const chart = getChart('chart-a1'); if (!chart) return;   // взять/создать график; нет контейнера → выход
+    // У блоков А «года» нет — фильтр по ИОГВ/форме. Пусто = фильтр отсёк всё.
+    if (showNoData('chart-a1', data.institutions.length===0, 'Нет данных по выбранным фильтрам')) return;
+    // counts — копилка-счётчик: для каждого типа считаем, сколько учреждений. {} = пустой объект.
+    const counts = {}; data.institutions.forEach(o => counts[o.type]=(counts[o.type]||0)+1);  // o.type — поле «тип»; +1 к счётчику
+    // превращаем счётчик в формат ECharts: [{name:'СОШ', value:600}, ...]
+    const series = Object.entries(counts).map(([name,value])=>({name,value}));
+    // ЕДИНАЯ ПАЛИТРА КОЛЕЦ: тот же тёплый набор, что у блока «Контингент» (см. schoolColors/gardenColors),
+    // чтобы оба кольца смотрелись из одного дашборда. Порядок: чернила, терракот, шалфей, камень, пыльно-синий, охра.
+    const UNIFIED_RING = ['#3A4A63', '#C2734A', '#889966', '#8A7B6B', '#6E84A6', '#D9A23F'];
+    // setOption(..., true) — НАРИСОВАТЬ. total — сумма всех value (для цифры в центре бублика)
+    chart.setOption(donutOption({ series, total: series.reduce((s,x)=>s+x.value,0), colors: UNIFIED_RING }), true);
+  }
+  function renderA2(allInstitutions) { // горизонтальные бары по районам — ВСЕ учреждения (без фильтра ИОГВ)
+    const chart = getChart('chart-a2'); if (!chart) return;
+    const counts = {};
+    // filter: выкидываем Ленинградскую обл. (/.../ i — поиск текста, i = без учёта регистра). ! = «НЕ»
+    allInstitutions.filter(o=>!/Ленинградская/i.test(o.area)).forEach(o=>counts[o.area]=(counts[o.area]||0)+1);
+    const sorted = Object.entries(counts).sort((a,b)=>a[1]-b[1]);  // сортировка по количеству (a[1] = значение пары)
+    if (showNoData('chart-a2', sorted.length===0, 'Нет данных')) return;
+    chart.setOption({
+      tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, ...ttStyle(), valueFormatter:fmt },
+      grid:{ left:0, right:70, top:10, bottom:10, containLabel:true },
+      xAxis:{ type:'value', axisLabel:{...baseAxisLabel, formatter:fmt}, splitLine:{lineStyle:{color: TOKENS.split}} },
+      yAxis:{ type:'category', data:sorted.map(x=>x[0]), axisLabel:{...baseAxisLabel, fontSize:13, fontWeight:500} },
+      series:[{ type:'bar', data:sorted.map(x=>x[1]), barWidth:'62%',
+        itemStyle:{ borderRadius:[0,6,6,0],
+          color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color: TOKENS.accent},{offset:1,color: TOKENS.accent2}]) },
+        label:{ show:true, position:'right', fontSize:13, fontWeight:700, color: TOKENS.text, formatter:p=>fmt(p.value) } }],
+    }, true);
+  }
+  function renderA3(data) {           // бублик по формам собственности (тот же паттерн, что renderA1)
+    const chart = getChart('chart-a3'); if (!chart) return;
+    if (showNoData('chart-a3', data.institutions.length===0, 'Нет данных по выбранным фильтрам')) return;
+    const counts = {}; data.institutions.forEach(o=>counts[o.form]=(counts[o.form]||0)+1);
+    const series = Object.entries(counts).map(([name,value])=>({name,value}));
+    const UNIFIED_RING = ['#3A4A63', '#C2734A', '#889966', '#8A7B6B', '#6E84A6', '#D9A23F'];  // та же единая палитра колец
+    chart.setOption(donutOption_form({ series, total: series.reduce((s,x)=>s+x.value,0), colors: UNIFIED_RING }), true);
+  }
+
+  /* ===== БЛОК Б — контингент (источник: grup_count.json, отфильтрован по году+ИОГВ) ===== */
+  // вспомогательная: по номеру класса определить ступень школы. parseInt("3 кл") → 3
+  function parallelToStep(label) {
+    const n = parseInt(label,10);                    // 10 = система счисления (десятичная)
+    if (n>=1 && n<=4) return 'Начальная';            // && = «И» (оба условия верны)
+    if (n>=5 && n<=9) return 'Средняя';
+    if (n>=10 && n<=11) return 'Старшая';
+    return null;                                     // null = «ничего» (не подошло)
+  }
+  function renderB1(data, mode='all') {
+    const chart = getChart('chart-b1'); if (!chart) return;
+    const stepSums = { 'Начальная':0, 'Средняя':0, 'Старшая':0 };
+    data.grupCount.filter(r=>r.education_type==='школа').forEach(r=>{
+      const step = parallelToStep(r.group_label); if (step) stepSums[step]+=r.kids_or_students||0;
+    });
+    const schoolSeries = Object.entries(stepSums).map(([name,value])=>({name,value}));
+    const schoolTotal = schoolSeries.reduce((s,x)=>s+x.value,0);
+    const ageOrder = ['от 2 месяцев до 1 года','от 1 года до 3 лет','от 3 лет до 8 лет'];
+    const ageSums = {};
+    data.grupCount.filter(r=>r.education_type==='сад').forEach(r=>{ ageSums[r.group_label]=(ageSums[r.group_label]||0)+(r.kids_or_students||0); });
+    const gardenSeries = ageOrder.map(name=>({ name, value: ageSums[name]||0 }));
+    const gardenTotal = gardenSeries.reduce((s,x)=>s+x.value,0);
+    const totalAll = schoolTotal + gardenTotal;
+    // Заглушка «Нет данных»: смотрим сумму того режима, что выбран (Все/Школа/Сад).
+    // Напр. сады за 2021 пустые → показать «Нет данных за 2021 год» вместо нулевого бублика.
+    const yr = state.ui.contingentYear || '';
+    const relevantTotal = mode==='school' ? schoolTotal : mode==='garden' ? gardenTotal : totalAll;
+    if (showNoData('chart-b1', relevantTotal===0, 'Нет данных за '+yr+' год')) return;
+    /* ЕДИНАЯ ПАЛИТРА КОЛЕЦ (тот же набор, что у бублика «Сеть учреждений» — UNIFIED_RING ниже,
+       см. donutOption/CHART_PALETTE). Раньше кольца «Сеть» и «Контингент» были РАЗНЫХ цветов и
+       выглядели «из разных дашбордов». Теперь оба берут одни тёплые тона.
+       Школа = чернила → пыльно-синий → камень; сад = терракот → шалфей → светлый шалфей.
+       Разные «холодный/тёплый» концы помогают на глаз отличить кольцо школы от кольца сада. */
+    const schoolColors = ['#3A4A63', '#6E84A6', '#8A7B6B'];
+    const gardenColors = ['#C2734A', '#A7B383', '#D9C7A0'];
+    const baseOpt = { tooltip:{ trigger:'item', ...ttStyle(),
+      formatter:p=>`${p.seriesName}: ${p.name}<br/><b>${fmt(p.value)}</b> детей (${p.percent}%)` }, legend:{show:false} };
+    const centerText = (bigValue, bigLabel, extraLines=[]) => ({ type:'group', left:'center', top:'center', children:[
+      { type:'text', top:-26, style:{ text:fmt(bigValue), fontSize:42, fontWeight:800, fill: TOKENS.text, fontFamily:'Manrope, Inter', textAlign:'center' } },
+      { type:'text', top:22, style:{ text:bigLabel, fontSize:13, fill: TOKENS.text2, fontFamily:'Inter', textAlign:'center', fontWeight:500 } },
+      ...extraLines.map((line,i)=>({ type:'text', top:42+i*20, style:{ text:line.text, fontSize:13, fill:line.color, fontFamily:'Inter', textAlign:'center', fontWeight:700 } })),
+    ]});
+    const outsideLabel = { show:true, position:'outside',
+      formatter:p=>`{name|${p.name}}\n{val|${fmt(p.value)}}`,
+      rich:{
+        name:{ fontSize:14, color: TOKENS.text, fontWeight:700, lineHeight:18, fontFamily:'Manrope, Inter' },
+        val: { fontSize:12, color: TOKENS.text2, lineHeight:16, fontFamily:'Inter' }
+      } };
+    const lineStyle = { length:10, length2:14, smooth:true, lineStyle:{ color: TOKENS.text2, width:1.2 } };
+    let option;
+    if (mode==='school') {
+      option = { ...baseOpt, series:[{ name:'Школа', type:'pie', radius:['45%','78%'], center:['50%','48%'],
+        itemStyle:{borderRadius:6,borderColor: TOKENS.surface,borderWidth:2}, label:outsideLabel, labelLine:lineStyle, color:schoolColors, data:schoolSeries }],
+        graphic:[centerText(schoolTotal,'школьников')] };
+    } else if (mode==='garden') {
+      option = { ...baseOpt, series:[{ name:'Сад', type:'pie', radius:['45%','78%'], center:['50%','48%'],
+        itemStyle:{borderRadius:6,borderColor: TOKENS.surface,borderWidth:2}, label:outsideLabel, labelLine:lineStyle, color:gardenColors, data:gardenSeries }],
+        graphic:[centerText(gardenTotal,'воспитанников')] };
+    } else {
+      /* Режим «Все»: внешнее кольцо — школа (3 ступени), внутреннее — сад (3 возраста).
+         Внутреннее кольцо узкое (['44%','56%']) → большое центральное окно для total.
+         Центр компактнее (34px вместо 42) — чтобы цифра не накладывалась на кольцо. */
+      var allCenter = { type:'group', left:'center', top:'center', children:[
+        { type:'text', top:-18, style:{ text:fmt(totalAll), fontSize:34, fontWeight:800, fill: TOKENS.text, fontFamily:'Manrope, Inter', textAlign:'center' } },
+        { type:'text', top:18,  style:{ text:'всего детей', fontSize:12, fill: TOKENS.text2, fontFamily:'Inter', textAlign:'center', fontWeight:500 } },
+      ]};
+      option = { ...baseOpt,
+        legend:{ show:true, bottom:0, textStyle:{ ...baseTextStyle, color: TOKENS.text2 },
+          data:[
+            { name:'Школа', icon:'rect', itemStyle:{ color: TOKENS.accent } },
+            { name:'Сад',   icon:'rect', itemStyle:{ color: TOKENS.accent2 } }
+          ] },
+        series:[
+          { name:'Школа', type:'pie', radius:['66%','86%'], center:['50%','46%'], itemStyle:{borderRadius:8,borderColor: TOKENS.surface,borderWidth:3}, label:outsideLabel, labelLine:lineStyle, color:schoolColors, data:schoolSeries },
+          { name:'Сад',   type:'pie', radius:['44%','56%'], center:['50%','46%'], itemStyle:{borderRadius:4,borderColor: TOKENS.surface,borderWidth:2}, label:{show:false}, color:gardenColors, data:gardenSeries },
+        ],
+        graphic:[allCenter] };
+    }
+    chart.setOption(option, true);
+  }
+  function renderB3(data) {            // bar по параллелям 1-11
+    const chart = getChart('chart-b3'); if (!chart) return;
+    const grouped = {};
+    data.grupCount.filter(r=>r.education_type==='школа').forEach(r=>{
+      const p = parseInt(r.group_label,10); if (!p||p<1||p>11) return;
+      if (!grouped[p]) grouped[p] = { value:0, step:parallelToStep(r.group_label) };
+      grouped[p].value += r.kids_or_students||0;
+    });
+    const parallels = Object.keys(grouped).map(Number).sort((a,b)=>a-b);
+    // Заглушка: нет параллелей (нет школьников за выбранный год/ИОГВ) → «Нет данных за N год».
+    if (showNoData('chart-b3', parallels.length===0, 'Нет данных за '+(state.ui.contingentYear||'')+' год')) return;
+    /* Ступени = 3 бренд-акцента: сталь-синь / бирюза / мягкий фиолет */
+    const stepColor = { 'Начальная': TOKENS.accent, 'Средняя': TOKENS.accent2, 'Старшая': TOKENS.accent3 };
+    const series = parallels.map(p=>({ value:grouped[p].value, itemStyle:{ color: stepColor[grouped[p].step] || TOKENS.muted } }));
+    chart.setOption({
+      tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, ...ttStyle(), valueFormatter:v=>fmt(v)+' учеников' },
+      grid:{ left:40, right:10, top:30, bottom:30, containLabel:true },
+      legend:{ bottom:0, textStyle:{ ...baseTextStyle, color: TOKENS.text2 }, data:[
+        {name:'Начальная',icon:'rect',itemStyle:{color: TOKENS.accent}},
+        {name:'Средняя',icon:'rect',itemStyle:{color: TOKENS.accent2}},
+        {name:'Старшая',icon:'rect',itemStyle:{color: TOKENS.accent3}} ] },
+      xAxis:{ type:'category', data:parallels.map(p=>`${p} класс`), axisLabel:{...baseAxisLabel, fontSize:13, fontWeight:600}, axisLine:{lineStyle:{color: TOKENS.border}} },
+      yAxis:{ type:'value', name:'Учащиеся', nameLocation:'middle', nameGap:60, nameRotate:90,
+        nameTextStyle:{color: TOKENS.text2,fontSize:13,fontFamily:'Inter',fontWeight:600},
+        axisLabel:{...baseAxisLabel, formatter:fmtAxisShort}, splitLine:{lineStyle:{color: TOKENS.split}} },
+      series:[{ type:'bar', data:series, itemStyle:{borderRadius:[8,8,0,0]}, barWidth:'55%',
+        label:{ show:true, position:'top', fontSize:12, color: TOKENS.text2, formatter:p=>fmt(p.value), fontWeight:700, fontFamily:'Inter' } }],
+    }, true);
+  }
+
+  /* ===== БЛОК В — вакансии (источник: vacancies.json) =====
+     Связка treemap (районы) + bar (должности) с ДВУСТОРОННЕЙ фильтрацией.
+     Локальное состояние выбора живёт в _vacSel; данные блока кэшируются в _vacRows,
+     чтобы клики перерисовывали без повторного applyFilters(). */
+  let _vacRows = [];                              // строки вакансий текущего глоб. фильтра (кэш)
+  let _vacSel = { area: null, job: null };        // ЧТО выбрано кликом: либо район, либо должность (другое = null)
+
+  /* Топ должностей считается по ПОЛНОМУ совпадению поля job (по согласованию):
+     «учитель математики» и «учитель физики» — разные строки, не группируются по слову. */
+  function _countBy(rows, key){ const m={}; rows.forEach(r=>{ const v=key==='area'?r.area:r.job; if(v) m[v]=(m[v]||0)+1; }); return m; }
+
+  function renderVacancies(data) {
+    // Блок В НЕ реагирует на глобальный фильтр ИОГВ — берём ВСЕ вакансии (state.data.vacancies),
+    // а не отфильтрованные data.vacancies. У блока своя двусторонняя фильтрация по клику
+    // (район ↔ должность). Поэтому игнорируем переданный фильтр.
+    _vacRows = state.data.vacancies.filter(v=>!/Ленинградская/i.test(v.area));
+    _vacSel = { area:null, job:null };
+    drawVac();
+  }
+
+  function drawVac() {                              // перерисовать оба графика вакансий + подпись состояния
+    drawVacTreemap();
+    drawVacBar();
+    const st = document.getElementById('vacState');
+    // ТЕРНАРНЫЙ оператор: условие ? значениеЕслиДа : значениеЕслиНет (короткая замена if/else).
+    // .textContent — текст внутри элемента. Тут: показать что выбрано.
+    if (st) st.textContent = _vacSel.area ? ('Район: '+_vacSel.area)
+                          : _vacSel.job  ? ('Должность: '+_vacSel.job)
+                          : 'Все районы и должности';
+  }
+
+  function drawVacTreemap() {            // treemap районов — мульти-стоповая бренд-палитра
+    const chart = getChart('chart-v1'); if (!chart) return;
+    // Если выбрана должность — treemap показывает ТОЛЬКО районы с этой вакансией
+    const rows = _vacSel.job ? _vacRows.filter(v=>v.job===_vacSel.job) : _vacRows;
+    if (showNoData('chart-v1', rows.length===0, 'Нет данных по вакансиям')) return;
+    const counts = _countBy(rows, 'area');
+    const total = Object.values(counts).reduce((s,x)=>s+x,0)||1;
+    const vals = Object.values(counts);
+    const max = Math.max(...vals,1), min = Math.min(...vals,max);
+    /* ОДНОТОННАЯ чистая шкала «светлый → тёмная хвоя» (один цвет, меняется насыщенность).
+       ТЕМА: в светлой теме шкала начинается со светло-кремового; в ТЁМНОЙ — со средне-хвойного
+       (не с почти-белого!), иначе светлые плитки на тёмной карточке давали «белые прорези»
+       между ячейками. Так в обеих темах плитки сидят на фоне естественно. */
+    var __dark = document.documentElement.getAttribute('data-bs-theme')==='dark'
+              || document.documentElement.classList.contains('theme-dark');
+    const STOPS = __dark
+      ? ['#3A5A4C', '#46836D', '#5C9C84', '#74B49B', '#8FC9B1', '#A9DAC6']   // тёмная тема: от тёмной хвои к светлой
+      : ['#EFEADF', '#CBE0D2', '#9FC6B2', '#6FA88F', '#46836D', '#2E5F4E'];  // светлая тема: крем → тёмная хвоя
+    const hexToRgb = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+    const lerp = (a, b, f) => Math.round(a + (b - a) * f);
+    const pickStop = t => { const tc=Math.max(0,Math.min(1,t)), n=STOPS.length-1, pos=tc*n, i=Math.min(Math.floor(pos),n-1), f=pos-i;
+      const a=hexToRgb(STOPS[i]), b=hexToRgb(STOPS[i+1]); return [lerp(a[0],b[0],f),lerp(a[1],b[1],f),lerp(a[2],b[2],f)]; };
+    const labelOn = ([r,g,b]) => ((0.299*r + 0.587*g + 0.114*b) / 255 > 0.58) ? '#2B2A28' : '#FFFFFF';
+    const shadowOn = lum => lum === '#FFFFFF' ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.25)';
+    const series = Object.entries(counts).map(([name,value]) => {
+      const t = (value - min) / Math.max(1, max - min);
+      const rgb = pickStop(t), lbl = labelOn(rgb);
+      // приглушаем невыбранные районы (блёкло, opacity 0.3)
+      const dim = _vacSel.area && _vacSel.area!==name;
+      const isSel = _vacSel.area===name;
+      // ВЫБРАННЫЙ намного крупнее: treemap считает площадь по value → раздуваем выбранного (×6).
+      // realValue хранит настоящее число вакансий для подписи/tooltip/%.
+      const sizeValue = isSel ? value * 6 : value;
+      return { name, value: sizeValue, realValue: value, pct:((value/total)*100).toFixed(1), _sel:isSel,
+        itemStyle:{ color:`rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`, opacity: dim?0.3:1,
+                    // выделение только рамкой (без тени): у выбранного — толстая белая рамка
+                    borderColor: isSel?(__dark?'#F0EBE2':'#FFFFFF'):TOKENS.surface, borderWidth: isSel?4:1 },
+        label:{ formatter:p=>`{name|${p.name.replace(/\s*район[а-я]*$/i,'')}}\n{val|${fmt(p.data.realValue)}  ·  ${p.data.pct}%}`,
+          rich:{ name:{fontSize:16,fontWeight:800,color:lbl,lineHeight:22,textShadowColor:shadowOn(lbl),textShadowBlur:4,fontFamily:'Manrope, Inter'},
+                 val:{fontSize:13,color:lbl,opacity:0.88,fontFamily:'Inter',fontWeight:500} } } };
+    // Сортировка: выбранный — ПЕРВЫМ (слева-сверху), остальные по убыванию количества.
+    }).sort((a,b)=> (b._sel?1:0)-(a._sel?1:0) || b.value-a.value);
+    chart.setOption({
+      title:{ text: _vacSel.job ? ('Районы · «'+_vacSel.job+'»') : 'Вакансии по районам', left:'center', top:6,
+              textStyle:{ fontSize:14, color:TOKENS.text, fontFamily:'Manrope, Inter', fontWeight:700 } },
+      tooltip:{ ...ttStyle(), formatter:p=>`${p.name}<br/><b>${fmt(p.data.realValue)}</b> вакансий (${p.data.pct}%)` },
+      series:[{ type:'treemap', data:series, roam:false, nodeClick:false, breadcrumb:{show:false}, top:36,
+        label:{ show:true },
+        /* ФИКС «белых прорезей» в тёмной теме: зазор между плитками (gapWidth) заливается
+           цветом границы РОДИТЕЛЬСКОГО узла, а он по умолчанию светлый (≈белый) → на тёмной
+           карточке прорези белели. Решение: в тёмной теме зазор ВЫКЛЮЧЕН (gapWidth:0 — белеть
+           нечему), в светлой — тонкий зазор цвета карточки. borderColor тоже = surface. */
+        itemStyle:{ gapWidth: __dark ? 0 : 1, borderRadius:6, borderColor: TOKENS.surface, borderWidth: __dark ? 0 : 1 } }],
+    }, true);
+    // СОБЫТИЕ: chart.on('click', ...) — «когда кликнут по графику, выполни это».
+    // off('click') сначала снимает старый обработчик, чтобы не накапливались дубли.
+    // Логика: кликнул район → запомнить его (повторный клик по тому же = снять, поэтому ===p.name?null), перерисовать.
+    chart.off('click'); chart.on('click', p=>{ if(!p.name)return;
+      _vacSel = { area: (_vacSel.area===p.name?null:p.name), job:null }; drawVac(); });
+  }
+
+  function drawVacBar() {                // hbar топ-15 должностей
+    const chart = getChart('chart-v2'); if (!chart) return;
+    // Если выбран район — bar показывает должности ТОЛЬКО этого района
+    const rows = _vacSel.area ? _vacRows.filter(v=>v.area===_vacSel.area) : _vacRows;
+    if (showNoData('chart-v2', rows.length===0, 'Нет данных по вакансиям')) return;
+    const counts = _countBy(rows, 'job');
+    const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,15).reverse();
+    const truncate = (s,n=38)=> s.length>n ? s.slice(0,n-1)+'…' : s;
+    const max = top.length ? top[top.length-1][1] : 1;
+    const colorScale = v => { const t=v/max, c1=[167,243,217], c2=[44,79,124];
+      return `rgb(${Math.round(c1[0]+(c2[0]-c1[0])*t)},${Math.round(c1[1]+(c2[1]-c1[1])*t)},${Math.round(c1[2]+(c2[2]-c1[2])*t)})`; };
+    chart.setOption({
+      title:{ text: _vacSel.area ? ('Топ должностей · '+_vacSel.area) : 'Топ-15 востребованных должностей', left:'center', top:6,
+              textStyle:{ fontSize:14, color:TOKENS.text, fontFamily:'Manrope, Inter', fontWeight:700 } },
+      tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, ...ttStyle(), formatter:p=>`${p[0].name}<br/><b>${fmt(p[0].value)}</b> вакансий` },
+      grid:{ left:0, right:75, top:42, bottom:10, containLabel:true },
+      xAxis:{ type:'value', axisLabel:{...baseAxisLabel, formatter:fmt}, splitLine:{lineStyle:{color: TOKENS.split}} },
+      yAxis:{ type:'category', data:top.map(x=>truncate(x[0])), axisLabel:{...baseAxisLabel, fontSize:13, fontWeight:500} },
+      series:[{ type:'bar', data:top.map(x=>{
+          var isSel = _vacSel.job===x[0];                 // эта должность выбрана?
+          var anySel = !!_vacSel.job;                     // выбрана ли вообще какая-то
+          // выбранная — тёмная и непрозрачная; невыбранные при активном выборе — слегка приглушены (opacity 0.45)
+          return { value:x[1], name:x[0],
+            itemStyle:{ color: isSel?TOKENS.text:colorScale(x[1]), opacity: (anySel && !isSel)?0.45:1, borderRadius:[0,8,8,0] } };
+        }),
+        barWidth:'68%', label:{ show:true, position:'right', fontSize:14, fontWeight:700, color: TOKENS.text, formatter:p=>fmt(p.value) } }],
+    }, true);
+    // клик по должности → фильтруем treemap (полное имя берём из data.name, не из обрезанной оси)
+    chart.off('click'); chart.on('click', p=>{ const job=p.data&&p.data.name?p.data.name:p.name;
+      _vacSel = { job: (_vacSel.job===job?null:job), area:null }; drawVac(); });
+  }
+
+  /* ===== KPI (источники: institutions / contingent_school / contingent_garden / vacancies) =====
+     ВНИМАНИЕ: KPI «Школьников» = Σ contingent_school.json (607 538) — это другое число,
+     чем в тепловой карте (599 045), т.к. там только администрации районов. См. шапку файла.
+     Все 4 карточки идентичны; цвет акцента (--card-accent) задаётся inline и плавно
+     меняется по позиции: сталь-синь → бирюза. Это рисует единую «ленту» сверху. */
+  function d2RenderKPI(data) {
+    const institutions = data.institutions.length;
+    // «Школьников» и «Дошкольников» считаем из grupCount — ОДНОГО источника с кругом «Контингент»
+    // и тепловой картой, чтобы числа совпадали. Раньше брали из contingent_school/garden.json,
+    // которые джойнятся с реестром и теряют записи, не сматчившиеся по ИНН (школьники 607 538 vs 608 227,
+    // дошкольники 217 285 vs 231 252). data.grupCount уже отфильтрован по году+ИОГВ в applyFilters().
+    const schoolStudents = data.grupCount.filter(r=>r.education_type==='школа')
+                                         .reduce((s,r)=>s+(r.kids_or_students||0),0);
+    const gardenKids = data.grupCount.filter(r=>r.education_type==='сад')
+                                     .reduce((s,r)=>s+(r.kids_or_students||0),0);
+    const vacancies = data.vacancies.length;
+    /* Все 4 KPI-карточки ОДНОГО цвета — ТЕРРАКОТ (#C2734A): тёплая подложка иконки +
+       отблеск в углу. Раньше были почти белые/серые («пусто»). Теперь теплее, в тон вкладкам.
+       Хочешь «радугу» — поставь 4 разных (напр. ['#C2734A','#8A7B6B','#889966','#3A4A63']). */
+    const KPI_STOPS = ['#C2734A', '#C2734A', '#C2734A', '#C2734A'];
+    //если хочешь разные то вот что:
+    //const KPI_STOPS = ['#C2734A', '#4A90B8', '#3E8E7E', '#C26B4A'];
+    // hint убраны по просьбе (подписи «ДОУ+СОШ», «1-11 классы» и т.п. больше не показываем).
+    // Иконка дошкольников/контингента — лошадка-качалка (ti-horse-toy) вместо бутылочки (медведя в Tabler нет).
+    const cards = [
+      { label:'Учреждений',                  value:institutions,    icon:'ti-building-community' },
+      { label:'Школьников',                  value:schoolStudents,  icon:'ti-school' },
+      { label:'Дошкольников',                value:gardenKids,      icon:'ti-horse-toy' },
+      { label:'Вакансии на «Работа России»', value:vacancies,       icon:'ti-briefcase' },
+    ];
+    const container = document.getElementById('kpiRow');
+    // h-100 (высота 100%) на карточке + align-items-stretch на ряду → все 4 карточки одной высоты на любом экране.
+    container.innerHTML = cards.map((c,i)=>`
+      <div class="col-sm-6 col-lg-3"><div class="kpi-card h-100" style="--card-accent:${KPI_STOPS[i]}">
+        <div class="kpi-icon"><i class="ti ${c.icon}"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">${c.label}</div>
+          <div class="kpi-value" id="d2-kpi-${i}">0</div>
+        </div>
+      </div></div>`).join('');
+    cards.forEach((c,i)=>{
+      const el = document.getElementById(`d2-kpi-${i}`); if (!el) return;
+      const counter = new countUp.CountUp(el, c.value, { duration:0.9, separator:' ', useEasing:true });
+      if (!counter.error) counter.start(); else el.textContent = c.value.toLocaleString('ru-RU');
+    });
+  }
+
+  window.addEventListener('resize', () => { Object.values(_d2charts).forEach(c=>c&&c.resize()); });
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       JS ЧАСТЬ 2 — ДИРИЖЁР (бывший d2_app.js): загрузка JSON, фильтры,
+       тема, viz-menu (скачать PNG / печать).
+       ═══════════════════════════════════════════════════════════════ -->
+  <script>
+  /* ===== ГЛОБАЛЬНОЕ СОСТОЯНИЕ =====
+     state — ОДИН объект, где лежит «вся память» дашборда: загруженные данные,
+     что выбрано в фильтрах, настройки интерфейса. Любая функция читает/меняет его.
+     Вложенные {} — это объекты внутри объекта. [] — пустые массивы (заполнятся при загрузке). */
+  const state = {
+    data: { institutions:[], schoolContingent:[], gardenContingent:[], vacancies:[],   // сырые данные из JSON
+            dimAreas:[], dimForms:[], dimTypes:[], dimIogv:[], dimYears:[], grupCount:[] },  // dim* = справочники
+    filters: { iogv:[], forms:[] },                // что выбрал пользователь в фильтрах (пока пусто = «всё»)
+    ui: { b1Mode:'all', contingentYear:null },     // состояние интерфейса (режим блока Б, выбранный год)
+  };
+
+  /* ===== ЗАГРУЗКА JSON =====
+     ХРУПКОЕ МЕСТО: dim-файлы (dim_forms/dim_types/dim_areas) обёрнуты в объект,
+     где КЛЮЧ = текст SQL-запроса, а значение = массив. Поэтому используем
+     Object.values(json)[0]. dim_iogv/dim_years — уже чистые массивы.
+     Если в обёрнутом файле появится 2-й ключ — возьмётся первый (риск!). */
+  // async/await/fetch — как грузят файлы из интернета/диска:
+  //   • fetch(path) — запросить файл (это занимает время)
+  //   • await — «подождать, пока придёт ответ» (работает только внутри async-функции)
+  //   • try { ... } catch (err) { ... } — попробовать; если ошибка — не падать, а обработать
+  async function loadJSON(path) {
+    try {
+      const r = await fetch(path);                 // запросить файл
+      const json = await r.json();                 // превратить ответ в данные (разобрать JSON)
+      // некоторые файлы — это объект-обёртка, а не массив. Тогда берём первое значение внутри.
+      return Array.isArray(json) ? json : Object.values(json)[0] || [];
+    } catch (err) { console.error(`Не удалось загрузить ${path}:`, err); return []; }  // ошибка → пустой массив
+  }
+
+  async function loadAllData() {
+    const base = 'data_bd/';                        // папка с данными
+    // Promise.all([...]) — запустить ВСЕ загрузки ОДНОВРЕМЕННО и дождаться всех (быстрее, чем по одной).
+    // [ a, b, c ] = await Promise.all([...]) — «разложить» результаты по переменным по порядку.
+    const [ institutions, schoolContingent, gardenContingent, vacancies,
+            dimAreas, dimForms, dimTypes, dimIogv, dimYears, grupCount ] = await Promise.all([
+      loadJSON(base+'institutions.json'),
+      loadJSON(base+'contingent_school.json'),   // школьники по параллелям (поле students)
+      loadJSON(base+'contingent_garden.json'),   // воспитанники (поле kids)
+      loadJSON(base+'vacancies.json'),
+      loadJSON(base+'dim_areas.json'),
+      loadJSON(base+'dim_forms.json'),
+      loadJSON(base+'dim_types.json'),
+      loadJSON(base+'dim_iogv.json'),            // {value:iogv_inn, label:iogv_shortname}
+      loadJSON(base+'dim_years.json'),
+      loadJSON(base+'grup_count.json'),          // агрегат класс×год для блоков Б и наполняемости
+    ]);
+    /* Нормализация: в JSON числа иногда записаны строками ("607" вместо 607).
+       Number("607")=607 превращает в настоящее число; ||0 — если не вышло, ставим 0.
+       Без этого сложение давало бы склейку строк ("1"+"2"="12" вместо 3). */
+    schoolContingent.forEach(r=>{ r.students=Number(r.students)||0; r.parallel=Number(r.parallel)||0; });
+    gardenContingent.forEach(r=>{ r.kids=Number(r.kids)||0; r.groups=Number(r.groups)||0; });
+    vacancies.forEach(v=>{ v.salary_min=Number(v.salary_min)||0; v.salary_max=Number(v.salary_max)||0; v.salary_mid=Number(v.salary_mid)||0; });
+    grupCount.forEach(r=>{ r.year=Number(r.year)||0; r.groups_or_classes=Number(r.groups_or_classes)||0; r.kids_or_students=Number(r.kids_or_students)||0; });
+    state.data = { institutions, schoolContingent, gardenContingent, vacancies, dimAreas, dimForms, dimTypes, dimIogv, dimYears, grupCount };
+    /* Самый свежий год из данных. new Set(...) убирает повторы (оставляет уникальные).
+       [...Set] — превратить обратно в массив. filter(Boolean) — выкинуть пустые/нулевые.
+       sort((a,b)=>b-a) — по УБЫВАНИЮ, поэтому [0] = самый большой (свежий) год. */
+    const years = [...new Set(grupCount.map(r=>r.year).filter(Boolean))].sort((a,b)=>b-a);
+    if (years.length) state.ui.contingentYear = String(years[0]);  // .length>0 = массив не пустой
+  }
+
+  /* ===== ФИЛЬТРАЦИЯ (только блоки А/Б/В; наполняемость НЕ затрагивается) =====
+     applyFilters берёт ВСЕ данные и оставляет только подходящие под выбранные фильтры.
+     Возвращает новый набор данных, который потом уходит в графики. */
+  function applyFilters() {
+    const { iogv, forms } = state.filters;         // «деструктуризация»: вытащить поля iogv и forms из state.filters
+    // inSet: подходит ли значение? Если фильтр пуст (arr.length===0) → подходит всё. includes = «есть ли в списке».
+    const inSet = (val, arr) => arr.length===0 || arr.includes(val);  // || = «ИЛИ»
+    /* grup_count/contingent/vacancies хранят ИОГВ строкой (iogv_shortname) —
+       переводим выбранные inn в названия. Нужно ВЫШЕ okIogv, т.к. оно их использует. */
+    const selectedIogvNames = iogv.length
+      ? new Set(state.data.dimIogv.filter(o=>iogv.includes(String(o.value))).map(o=>o.label)) : null;
+    /* Фильтр по ИОГВ. ВАЖНО: поле различается по файлам —
+       institutions имеет iogv_inn, а contingent_school/garden и vacancies — только
+       iogv_shortname. Раньше okIogv смотрел лишь iogv_inn → у трёх файлов оно undefined
+       → все записи отсеивались → KPI «Школьников/Воспитанников/Вакансий» обнулялись.
+       Теперь проверяем оба поля: сперва iogv_inn, иначе iogv_shortname по именам. */
+    const okIogv = o => {
+      if (iogv.length===0) return true;
+      if (o.iogv_inn) return iogv.includes(String(o.iogv_inn));
+      if (o.iogv_shortname && selectedIogvNames) return selectedIogvNames.has(o.iogv_shortname);
+      return false;
+    };
+    const yearNum = Number(state.ui.contingentYear);
+    const grupCountFiltered = state.data.grupCount.filter(r => {
+      if (r.year !== yearNum) return false;
+      if (selectedIogvNames) return r.iogv_shortname && selectedIogvNames.has(r.iogv_shortname);
+      /* ИОГВ не выбран → все разрезы, но НЕ агрегаты с iogv_shortname=null (двойной счёт) */
+      return r.iogv_shortname !== null;
+    });
+    // Возвращаем отфильтрованные копии каждого набора. Условие: okIogv (по органу) И (&&) inSet (по форме).
+    return {
+      institutions:     state.data.institutions    .filter(o=>okIogv(o) && inSet(o.form, forms)),
+      schoolContingent: state.data.schoolContingent.filter(o=>okIogv(o) && inSet(o.form, forms)),
+      gardenContingent: state.data.gardenContingent.filter(o=>okIogv(o) && inSet(o.form, forms)),
+      vacancies:        state.data.vacancies       .filter(o=>okIogv(o) && inSet(o.form, forms)),
+      grupCount:        grupCountFiltered,
+    };
+  }
+
+  /* ===== ФИЛЬТРЫ UI (создание выпадающих списков и реакция на выбор) ===== */
+  let _iogvChoices, _formChoices;                  // сюда сохраним объекты Choices, чтобы потом читать выбор
+  function initIogvFilter() {
+    const sel = document.getElementById('filterIogv');  // наш пустой <select> из HTML
+    // Заполняем список вариантами из справочника dimIogv. Для каждого создаём <option> и кладём внутрь select:
+    //   createElement('option') — создать тег; .value/.textContent — задать; appendChild — вставить в select.
+    state.data.dimIogv.forEach(o=>{ const opt=document.createElement('option'); opt.value=String(o.value); opt.textContent=o.label; sel.appendChild(opt); });
+    // Превращаем обычный select в «умный» (Choices.js): поиск, чипы, кнопки удаления.
+    _iogvChoices = new Choices(sel, { removeItemButton:true, searchResultLimit:50, placeholderValue:'Все органы власти', searchPlaceholderValue:'Поиск...', noResultsText:'Нет совпадений', itemSelectText:'' });
+    // addEventListener('change', ...) — «когда выбор изменится, выполни это»: сохранить выбор в state и перерисовать всё.
+    sel.addEventListener('change', ()=>{ state.filters.iogv = _iogvChoices.getValue(true).map(String); rerender(); });
+  }
+  function initFormFilter() {
+    const sel = document.getElementById('filterForms');
+    state.data.dimForms.forEach(f=>{ const opt=document.createElement('option'); opt.value=f.label; opt.textContent=f.label; sel.appendChild(opt); });
+    _formChoices = new Choices(sel, { removeItemButton:true, placeholderValue:'Все формы', searchPlaceholderValue:'Поиск...', noResultsText:'Нет совпадений', itemSelectText:'' });
+    sel.addEventListener('change', ()=>{ state.filters.forms = _formChoices.getValue(true); rerender(); });
+  }
+  function initContingentYear() {
+    const sel = document.getElementById('contingentYear'); if (!sel) return;
+    const years = [...new Set(state.data.grupCount.map(r=>r.year).filter(Boolean))].sort((a,b)=>b-a);
+    years.forEach(y=>{ const opt=document.createElement('option'); opt.value=String(y); opt.textContent=String(y); if (String(y)===state.ui.contingentYear) opt.selected=true; sel.appendChild(opt); });
+    sel.addEventListener('change', ()=>{ state.ui.contingentYear=sel.value; const f=applyFilters(); d2RerenderB1(f, state.ui.b1Mode); d2RerenderB3(f); });
+  }
+  // Кнопка «Сбросить» главных фильтров: location.reload() — просто перезагрузить страницу.
+  function initReset() { document.getElementById('resetFilters').addEventListener('click', ()=>location.reload()); }
+  /* Кнопка «Сбросить» в блоке вакансий — снимает локальный выбор района/должности */
+  function initVacReset() {
+    const btn = document.getElementById('vacReset');
+    if (btn) btn.addEventListener('click', ()=>{ _vacSel={area:null,job:null}; drawVac(); });
+  }
+  // Переключатель Все/Школа/Сад над бубликом контингента.
+  function initB1Toggle() {
+    const wrap = document.getElementById('b1Toggle'); if (!wrap) return;
+    // Слушаем клик на всей группе сразу (а не на каждой кнопке). e = событие; e.target — куда именно кликнули;
+    // .closest('.b1-btn') — найти ближайшую кнопку-родителя. Это «делегирование событий» (удобно и быстро).
+    wrap.addEventListener('click', e=>{ const btn=e.target.closest('.b1-btn'); if (!btn) return;
+      // classList.toggle('active', условие) — добавить/убрать класс. Тут: подсветить нажатую, погасить остальные.
+      wrap.querySelectorAll('.b1-btn').forEach(b=>b.classList.toggle('active', b===btn));
+      // btn.dataset.mode читает атрибут data-mode из HTML кнопки ("all"/"school"/"garden") → перерисовать блок Б.
+      state.ui.b1Mode = btn.dataset.mode; d2RerenderB1(applyFilters(), state.ui.b1Mode); });
+  }
+  function renderActiveFilters() {
+    const box = document.getElementById('activeFilters'); const pills = [];
+    state.filters.iogv.forEach(inn=>{ const found=state.data.dimIogv.find(o=>String(o.value)===inn); if (found) pills.push(`<span class="active-chip"><i class="ti ti-building-bank" style="font-size:.85rem;"></i>${found.label}</span>`); });
+    state.filters.forms.forEach(f=>pills.push(`<span class="active-chip"><i class="ti ti-building" style="font-size:.85rem;"></i>${f}</span>`));
+    // .innerHTML — заменить ВСЁ содержимое элемента готовым HTML-текстом.
+    // pills.join('') — склеить массив строк в одну. Шаблонные строки `...${переменная}...` (обратные кавычки)
+    // вставляют значение прямо в текст — удобно собирать HTML.
+    box.innerHTML = pills.length ? pills.join('') : '<span class="text-muted small">фильтры не применены</span>';
+  }
+
+  /* ===== ТЕМА — двойная привязка (data-bs-theme + .theme-light/.theme-dark)
+     Хук onThemeChange перерисовывает все графики через текущие TOKENS. ===== */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-bs-theme', theme);
+    document.documentElement.classList.remove('theme-light', 'theme-dark');
+    document.documentElement.classList.add('theme-' + theme);
+    /* Иконка и подпись (aria/title) на кнопке-квадратике темы.
+       В тёмной теме показываем «солнце» (вернуться к светлой), в светлой — «луну». */
+    const icon = document.getElementById('themeBtnIcon');
+    if (icon) icon.className = (theme==='dark' ? 'ti ti-sun' : 'ti ti-moon-stars');
+    const btn = document.getElementById('themeBtn');
+    if (btn) { const lbl = (theme==='dark' ? 'Светлая тема' : 'Тёмная тема'); btn.setAttribute('aria-label', lbl); btn.title = lbl; }
+    onThemeChange();
+  }
+  // Переключить тему свет↔тьма (кнопка в меню).
+  function cycleTheme() {
+    const now  = document.documentElement.getAttribute('data-bs-theme') || 'light';  // текущая
+    const next = (now === 'dark') ? 'light' : 'dark';  // противоположная
+    applyTheme(next);
+    // localStorage — «память браузера», переживает перезагрузку. Запоминаем выбор темы.
+    localStorage.setItem('theme', next);
+  }
+  function onThemeChange() {
+    /* Перерисовываем все графики с новыми токенами */
+    refreshTokens();
+    if (state.data.institutions.length) {
+      const filtered = applyFilters();
+      d2RenderAllCharts(filtered, state.data.institutions, state.ui.b1Mode);
+    }
+    /* Хук для IIFE наполняемости — если она зарегистрировала свой обработчик */
+    if (typeof window.napRerender === 'function') window.napRerender();
+  }
+  function initTheme() {
+    /* Приоритет: сохранённая → системная → светлая */
+    let saved = localStorage.getItem('theme');
+    if (!saved) {
+      saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    applyTheme(saved);
+  }
+
+  // rerender — ГЛАВНАЯ СВЯЗКА: «фильтр изменился → пересчитать и перерисовать всё».
+  // Вызывается из обработчиков фильтров. Порядок: отфильтровать → KPI → графики → чипы активных фильтров.
+  function rerender() {
+    const filtered = applyFilters();               // 1) применить фильтры → новые данные
+    d2RenderKPI(filtered);                          // 2) обновить 4 KPI-карточки
+    d2RenderAllCharts(filtered, state.data.institutions, state.ui.b1Mode);  // 3) перерисовать графики А/Б/В
+    renderActiveFilters();                          // 4) показать «чипы» выбранных фильтров
+  }
+  /* Табы Bootstrap: ресайз + подсказки */
+  document.addEventListener('shown.bs.tab', e=>{
+    const id = e.target.getAttribute('data-chart');
+    const chart = _d2charts['chart-'+id]; if (chart) chart.resize();
+    const card = e.target.closest('.card');
+    if (card) card.querySelectorAll('.chart-hint').forEach(h=>h.classList.toggle('active', h.dataset.hintFor===id));
+  });
+  function activateInitialHints() {
+    document.querySelectorAll('.card .nav-link.active[data-chart]').forEach(link=>{
+      const id = link.dataset.chart; const card = link.closest('.card');
+      card.querySelectorAll('.chart-hint').forEach(h=>h.classList.toggle('active', h.dataset.hintFor===id));
+    });
+  }
+  // init — ТОЧКА ВХОДА. Самая первая функция, с неё начинается вся работа дашборда.
+  // Порядок важен: тема → меню → ЗАГРУЗКА данных (ждём await) → создать фильтры → первая отрисовка.
+  async function init() {
+    initTheme();         /* Сначала тема — чтобы первые рендеры взяли правильные цвета (TOKENS) */
+    await loadAllData(); /* ЖДЁМ, пока загрузятся все JSON — без данных рисовать нечего */
+    // Создаём выпадашки фильтров, селектор года, кнопки. Каждая init*-функция вешает свои обработчики.
+    initIogvFilter(); initFormFilter(); initContingentYear(); initReset(); initB1Toggle(); initVacReset();
+    rerender(); activateInitialHints();              /* первая отрисовка всего + показать подсказки активных вкладок */
+    if (window.initNapolnyaemost) window.initNapolnyaemost();  /* запускаем блок наполняемости (он отдельный, ниже) */
+  }
+  // Запуск: если страница ещё грузится — ждём события DOMContentLoaded («HTML готов»), иначе запускаем сразу.
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       JS ЧАСТЬ 3 — БЛОК НАПОЛНЯЕМОСТИ (перенесён из napolnyaemost.html)
+       Обёрнут в IIFE для изоляции от d2-кода. Источники: grup_count.json
+       (роза/heatmap) и population_education.json (доля населения).
+       Независим от главного фильтра ИОГВ.
+       Все хардкод-цвета (text/border/tooltip) обёрнуты через t() — читаются
+       из CSS-токенов при каждом рендере → корректно следуют за темой.
+       ═══════════════════════════════════════════════════════════════ -->
+  <script>
+  // (function () { ... })(); — IIFE, «функция, которая сама себя сразу вызывает».
+  // Зачем: весь код наполняемости спрятан внутри, его переменные НЕ мешают коду выше (изоляция).
+  // var — старый способ объявить переменную (как let). Тут используется var, т.к. блок перенесён как есть.
+  (function () {
+    var chart7=null, chart7city=null, rawData7=[], popData7=[];  // 2 графика + 2 набора данных этого блока
+
+    /* t() — взять текущие цвета темы (своя копия, т.к. блок изолирован от кода выше) */
+    function t() {
+      var cs = getComputedStyle(document.documentElement);
+      var get = function(n, f){ return (cs.getPropertyValue(n).trim() || f); };
+      /* Fallback-значения обновлены под тёплую палитру (совпадают с :root). */
+      return {
+        text:          get('--text',             '#2B2A28'),
+        text2:         get('--text-secondary',   '#6B6155'),
+        muted:         get('--text-muted',       '#9A9082'),
+        bg:            get('--bg',               '#F7F4EF'),
+        surface:       get('--surface',          '#FFFFFF'),
+        surface2:      get('--surface-2',        '#F0EBE2'),
+        border:        get('--border',           'rgba(60,50,40,0.12)'),
+        accent:        get('--accent',           '#3A4A63'),
+        accent2:       get('--accent-secondary', '#3E7C6A'),
+        accent3:       get('--accent-tertiary',  '#C2734A'),
+        tooltipBg:     get('--tooltip-bg',       'rgba(43,42,40,0.97)'),
+        tooltipBorder: get('--tooltip-border',   'rgba(62,124,106,0.50)'),
+        tooltipText:   get('--tooltip-text',     '#F5F1EA'),
+      };
+    }
+    function tt() { var T=t(); return {
+      backgroundColor: T.tooltipBg, borderColor: T.tooltipBorder, borderWidth: 1,
+      textStyle: { color: T.tooltipText, fontSize: 13, fontFamily: 'Inter, sans-serif' },
+      extraCssText: 'box-shadow:0 8px 24px rgba(0,0,0,0.25); border-radius:8px; padding:10px 12px;',
+    }; }
+
+    // обрезает «Администрация X района» → «X» для подписей. replace меняет кусок текста.
+    function shortIogv(name){ return name.replace('Администрация ','').replace(' района',''); }
+
+    // window.initNapolnyaemost — «вешаем» функцию на глобальный объект window, чтобы init() выше её нашёл.
+    window.initNapolnyaemost = function () {
+      chart7 = echarts.init(document.getElementById('chart7'));        // создать главный график
+      chart7city = echarts.init(document.getElementById('chart7city')); // создать мини-карту «СПб»
+      chart7.showLoading({ text:'Загрузка...', color: t().accent });   // показать спиннер на время загрузки
+      // Грузим 2 файла разом. .then(...) — «когда загрузка ЗАВЕРШИТСЯ, сделай это» (альтернатива await).
+      Promise.all([
+        fetch('data_bd/grup_count.json').then(r=>r.json()),
+        fetch('data_bd/population_education.json').then(r=>r.json())
+      ]).then(function(res){                          // res = массив результатов: res[0] и res[1]
+        chart7.hideLoading();                          // убрать спиннер
+        var data = Array.isArray(res[0]) ? res[0] : Object.values(res[0])[0];  // развернуть обёртку, если надо
+        popData7 = Array.isArray(res[1]) ? res[1] : Object.values(res[1])[0];
+        /* Оставляем только «Администрация ... района» (для тепловой карты по районам).
+           indexOf('...')===0 — текст НАЧИНАЕТСЯ с этого; indexOf('...')>-1 — текст содержит это. */
+        rawData7 = data.filter(function(r){ return r.iogv_shortname && r.iogv_shortname.indexOf('Администрация')===0 && r.iogv_shortname.indexOf('район')>-1; });
+
+        // Уникальные годы из данных → создаём кнопку на каждый. Так кнопки годов сами обновятся, если в JSON добавят год.
+        var years = Array.from(new Set(rawData7.map(function(r){ return r.year; }))).sort();
+        var yc = document.getElementById('yearBtns7');  // контейнер для кнопок (был пустой в HTML)
+        years.forEach(function(y,i){ var b=document.createElement('button');  // создать кнопку
+          b.className='nap-tab'+(i===years.length-1?' active-tab':''); b.dataset.year=y; b.textContent=y;  // последняя (свежий год) — активна
+          b.type='button';
+          // при клике: снять active со всех кнопок года, поставить на эту, перерисовать график
+          b.onclick=function(){ yc.querySelectorAll('.nap-tab').forEach(function(x){x.classList.remove('active-tab');}); b.classList.add('active-tab'); renderChart7(); };
+          yc.appendChild(b); });  // вставить кнопку в контейнер
+
+        // Те же обработчики для готовых кнопок Уровень/Метрика/Шкала (они уже есть в HTML). Паттерн одинаков:
+        // «снять active со всех в группе → поставить на нажатую → перерисовать».
+        document.querySelectorAll('#typeBtns7 .nap-tab').forEach(function(b){ b.onclick=function(){ document.querySelectorAll('#typeBtns7 .nap-tab').forEach(function(x){x.classList.remove('active-tab');}); b.classList.add('active-tab'); renderChart7(); }; });
+        document.querySelectorAll('#metricBtns7 .nap-tab').forEach(function(b){ b.onclick=function(){ document.querySelectorAll('#metricBtns7 .nap-tab').forEach(function(x){x.classList.remove('active-tab');}); b.classList.add('active-tab'); renderChart7(); }; });
+        document.querySelectorAll('#scaleBtns7 .nap-tab').forEach(function(b){ b.onclick=function(){ document.querySelectorAll('#scaleBtns7 .nap-tab').forEach(function(x){x.classList.remove('active-tab');}); b.classList.add('active-tab'); renderChart7(); }; });
+        ['tab7rose','tab7heatmap','tab7byiogv','tab7coverage'].forEach(function(id){ document.getElementById(id).onclick=function(){
+          ['tab7rose','tab7heatmap','tab7byiogv','tab7coverage'].forEach(function(x){ document.getElementById(x).classList.remove('active-tab'); });
+          this.classList.add('active-tab'); renderChart7(); }; });
+
+        var allIogvs = Array.from(new Set(rawData7.map(function(r){ return r.iogv_shortname; }))).sort();
+
+        // Список ИОГВ для «Сводки по СПб»
+        var iogvSel = document.getElementById('iogvSelect7');
+        allIogvs.forEach(function(i){
+          var opt=document.createElement('option'); opt.value=i;
+          opt.textContent = i;            // полное название ИОГВ (обрезка отключена)
+          // opt.textContent = shortIogv(i);  // ← было: обрезка до «Адмиралтейский». Раскомментируй, чтобы вернуть.
+          iogvSel.appendChild(opt);
+        });
+        // Список ИОГВ для «Год по ИОГВ» (без пункта «Все районы» — нужен конкретный ИОГВ)
+        var iogvSelBy = document.getElementById('iogvSelectBy');
+        allIogvs.forEach(function(i){
+          var opt=document.createElement('option'); opt.value=i; opt.textContent=i; iogvSelBy.appendChild(opt);
+        });
+        // Оборачиваем оба select в Choices.js — поиск при нажатии + скролл (как в главном фильтре).
+        if (typeof Choices !== 'undefined') {
+          var chOpts = { searchEnabled:true, shouldSort:false, itemSelectText:'', searchResultLimit:50, searchPlaceholderValue:'Поиск...', noResultsText:'Нет совпадений', position:'bottom' };
+          new Choices(iogvSel, chOpts);
+          new Choices(iogvSelBy, chOpts);
+        }
+        iogvSel.addEventListener('change', renderChart7);   // Choices шлёт стандартное событие change
+        iogvSelBy.addEventListener('change', renderChart7);
+        renderChart7();                                // ПЕРВАЯ отрисовка (показать вкладку по умолчанию)
+
+        /* Хук: код темы выше зовёт window.napRerender при переключении тёмная/светлая — перерисуем с новыми цветами */
+        window.napRerender = renderChart7;
+      // .catch — если загрузка/обработка упала с ошибкой: убрать спиннер, написать в консоль, показать сообщение.
+      }).catch(function(err){ chart7.hideLoading(); console.error('Ошибка загрузки данных наполняемости:', err);
+        document.getElementById('chart7').innerHTML='<p style="text-align:center;color:'+t().muted+';padding:50px;">Не удалось загрузить данные</p>'; });
+    };
+
+    // renderChart7 — МАРШРУТИЗАТОР блока наполняемости: смотрит, какая вкладка активна,
+    // прячет/показывает нужные фильтры и вызывает нужную render-функцию.
+    function renderChart7() {
+      // Определяем активную вкладку (по классу active-tab) → строка-режим. querySelector — найти ПЕРВЫЙ по селектору.
+      var view = document.querySelector('#tab7rose').classList.contains('active-tab') ? 'rose'
+               : document.querySelector('#tab7heatmap').classList.contains('active-tab') ? 'heatmap'
+               : document.querySelector('#tab7byiogv').classList.contains('active-tab') ? 'byiogv' : 'coverage';
+      // .style.display = 'none' прячет блок, '' (пусто) — показывает. Так включаем нужные фильтры под каждый режим.
+      document.getElementById('filters7main').style.display = (view==='coverage') ? 'none' : 'flex';
+      document.getElementById('filters7cov').style.display  = (view==='coverage') ? 'flex' : 'none';
+      // Ряд «плашки + фильтр ИОГВ» виден только в «Сводке». Внутри него и stats7, и iogvFilter7Wrap.
+      document.getElementById('roseRow7').style.display = (view==='rose') ? 'flex' : 'none';
+      document.getElementById('iogvByWrap').style.display = (view==='byiogv') ? '' : 'none';
+      // У вкладки «Год по ИОГВ» свой выбор года не нужен (года — это ось), прячем кнопки года
+      document.getElementById('yearBtns7').parentElement.style.display = (view==='byiogv') ? 'none' : '';
+      var showCity = (view==='heatmap' || view==='coverage');  // строка «СПб» нужна только этим двум режимам
+      document.getElementById('chart7city').style.display = showCity ? '' : 'none';
+      document.getElementById('chart7citySep').style.display = showCity ? '' : 'none';
+      document.getElementById('normNote7').style.display = (view==='heatmap' || view==='byiogv') ? '' : 'none';
+
+      // return здесь = «выйти из функции». Каждый режим вызывает свою render-функцию и выходит.
+      if (view==='coverage') { document.getElementById('stats7').style.display='none'; renderCoverage7(); return; }
+
+      // Читаем выбранные Уровень и Метрику из data-атрибутов активных кнопок.
+      var type   = document.querySelector('#typeBtns7 .active-tab').dataset.type;     // 'школа' / 'сад'
+      var metric = document.querySelector('#metricBtns7 .active-tab').dataset.metric; // 'avg' / 'students' / 'pct'
+      // Шкала цвета (норматив/среднее) актуальна для avg в режимах heatmap и byiogv
+      document.getElementById('scaleBtns7Wrap').style.display = ((view==='heatmap'||view==='byiogv') && metric==='avg') ? '' : 'none';
+
+      // Ось «классы/возрасты» зависит от уровня: у школ 1–11 классов, у садов 3 возрастные группы.
+      var groups, groupsLabel;                       // groups — для поиска в данных, groupsLabel — для подписей
+      if (type==='школа') { groups=['1','2','3','4','5','6','7','8','9','10','11']; groupsLabel=groups.map(function(g){return g+' кл.';}); }
+      else { groups=['от 2 месяцев до 1 года','от 1 года до 3 лет','от 3 лет до 8 лет']; groupsLabel=['до 1 года','1–3 года','3–8 лет']; }
+
+      // У САДОВ колонка «до 1 года» почти пустая → убираем её на тепловых картах (heatmap/byiogv)
+      // для метрик «Наполняемость» (avg) и «Доля» (pct). Для «Контингента» (students) оставляем —
+      // там видно реальное число детей. Розу («Сводка») и школы не трогаем.
+      if (type==='сад' && (view==='heatmap'||view==='byiogv') && (metric==='avg'||metric==='pct')) {
+        groups = groups.slice(1);                    // выкидываем первую группу (от 2 месяцев до 1 года)
+        groupsLabel = groupsLabel.slice(1);          // и её подпись («до 1 года»)
+      }
+
+      // Режим «Год по ИОГВ»: один ИОГВ, все года (год не фильтруем — он станет осью).
+      if (view==='byiogv') {
+        document.getElementById('stats7').style.display='none';
+        var iogvBy = document.getElementById('iogvSelectBy').value;  // выбранный ИОГВ из списка
+        var rowsBy = rawData7.filter(function(r){ return r.education_type===type && r.iogv_shortname===iogvBy; });
+        renderByIogv7(rowsBy, type, metric, iogvBy, groups, groupsLabel); return;
+      }
+
+      // Остальные режимы фильтруют по выбранному ГОДУ. +document... — «+» превращает текст в число.
+      var year   = +document.querySelector('#yearBtns7 .active-tab').dataset.year;
+      var rows = rawData7.filter(function(r){ return r.year===year && r.education_type===type; });
+
+      // Режим «Сводка по СПб» (роза): либо все районы, либо один выбранный.
+      if (view==='rose') {
+        document.getElementById('stats7').style.display='flex';
+        var iogv = document.getElementById('iogvSelect7').value;
+        var roseRows = (iogv==='ALL') ? rows : rows.filter(function(r){ return r.iogv_shortname===iogv; });
+        renderRose7(roseRows, type, metric, year, groups, groupsLabel, iogv); return;
+      }
+      // Иначе — режим «ИОГВ по годам» (тепловая карта районов).
+      document.getElementById('stats7').style.display='none';
+      renderHeatmap7(rows, type, metric, year, groups, groupsLabel);
+    }
+
+    /* ── HEATMAP по районам + строка СПб ──
+       Тепловая карта = таблица: строки (Y) — районы, столбцы (X) — классы, цвет ячейки — значение. */
+    function renderHeatmap7(rows, type, metric, year, groups, groupsLabel) {
+      var T = t();                                   // цвета темы
+      var scale = document.querySelector('#scaleBtns7 .active-tab').dataset.scale;  // 'norm' / 'city'
+      var norm  = type==='школа' ? 25 : 22;          // норматив наполняемости (для шкалы цвета)
+      var iogvs = Array.from(new Set(rows.map(function(r){ return r.iogv_shortname; }))).sort();  // районы (ось Y), по алфавиту
+      var iogvShort = iogvs.map(shortIogv);          // короткие подписи
+      // Строим ячейки: ДВА вложенных цикла (каждый район × каждый класс). yi — номер строки, xi — столбца.
+      var heatmapData = [];
+      iogvs.forEach(function(iogv, yi){ groups.forEach(function(g, xi){
+        var r = rows.find(function(x){ return x.iogv_shortname===iogv && x.group_label===g; });  // find — найти запись для этой клетки
+        if (r){ var val = metric==='avg'?r.avg_per_group:metric==='students'?r.kids_or_students:r.pct;  // значение по выбранной метрике
+          // value:[столбец, строка, число] — формат тепловой карты ECharts. Остальное — для подсказки.
+          heatmapData.push({ value:[xi,yi,val], students:r.kids_or_students, classes:r.groups_or_classes, avg:r.avg_per_group, pct:r.pct }); }
+      }); });
+      /* ЗАЩИТА: если за выбранный год нет данных (напр. сады за 2024 пустые) —
+         показываем заглушку и НЕ строим visualMap. Иначе Math.min/max от пустого
+         массива дают Infinity/-Infinity, visualMap ломается НЕОБРАТИМО, и карта
+         не рисуется даже после возврата на год с данными (до перезагрузки). */
+      if (!heatmapData.length) {
+        chart7.setOption({
+          title: { text: 'Нет данных за ' + year + ' год', left:'center', top:'middle',
+                   textStyle:{ color: T.muted, fontSize:16, fontFamily:'Manrope, Inter' } },
+          tooltip: { show:false }, xAxis:{ show:false }, yAxis:{ show:false },
+          visualMap: [], series: [],
+        }, true);
+        chart7city.clear();
+        return;
+      }
+      // Среднее по городу = все дети ÷ все классы (по выбранному году и типу)
+      var cityK = rows.reduce(function(s,r){return s+r.kids_or_students;},0);
+      var cityC = rows.reduce(function(s,r){return s+r.groups_or_classes;},0);
+      var cityAvg = cityC ? cityK/cityC : norm;
+      var center = (metric==='avg' && scale==='city') ? cityAvg : norm;
+      var visualMap = buildVisualMap7(metric, heatmapData, center);
+      // Сноска: для «наполняемости» — норматив либо среднее по городу; для Контингента/Доли скрыта
+      updateNormNote7(metric, scale, type, cityAvg, year);
+      var labelFormatter = function(p){ var v=p.value[2]; if (metric==='students') return v.toLocaleString('ru-RU'); if (metric==='pct') return v+'%'; return v; };
+      var tip = function(labels){ return function(p){ var d=p.data, xi=d.value[0], yi=d.value[1];
+        return '<b style="color:'+T.accent2+'">'+labels[yi]+'</b><br/>Параллель: <b>'+groupsLabel[xi]+'</b><br/>'+
+          (type==='школа'?'Учащихся':'Воспитанников')+': <b>'+d.students.toLocaleString('ru-RU')+'</b><br/>'+
+          (type==='школа'?'Классов':'Групп')+': <b>'+d.classes+'</b><br/>Наполняемость: <b>'+d.avg+'</b> чел.<br/>Доля: <b>'+d.pct+'%</b>'; }; };
+      /* ЦВЕТ ТЕКСТА ЯЧЕЕК = фиксированный тёмный графит '#2B2A28' (НЕ T.text!).
+         Раньше брался T.text — в тёмной теме он светлый, а ячейки теперь всегда СВЕТЛЫЕ
+         (пастель), и светлый текст на них исчезал. Жёстко тёмный → читается всегда.
+         borderColor — тёплая граница (видимая «обводка» ячеек, чтобы карта не «слипалась»). */
+      var heatSeries = { type:'heatmap', label:{ show:true, formatter:labelFormatter, fontSize:type==='школа'?12:16, color:'#2B2A28', fontWeight:700, fontFamily:'Inter' },
+        itemStyle:{ borderColor: T.surface, borderWidth:3, borderRadius:6 },
+        emphasis:{ itemStyle:{ shadowBlur:12, shadowColor:'rgba(60,50,40,0.35)', borderColor:'#2B2A28', borderWidth:2 } }, progressive:0, animationDuration:400 };
+      /* ФИКС ШИРИНЫ ЯЧЕЕК: школы (11 столбцов) заполняют ширину как раньше, а сады (3 столбца)
+         НЕ растягиваются на всё поле — ширину ячейки ограничиваем потолком CELL_MAX. Так клетки
+         школ и садов соизмеримы, и строка «СПб» не выглядит непропорционально широкой.
+         Обе карты (chart7 и строка СПб) используют ОДНУ ширину поля gridW → столбцы совпадают. */
+      var CELL_MAX = 90;                                  // потолок ширины одной ячейки, px
+      var availW = (chart7.getWidth() || 800) - 240 - 40; // под клетки: канвас − левые подписи (240) − правый отступ (40)
+      var cellW  = Math.min(CELL_MAX, availW / groups.length);
+      var gridW  = Math.max(cellW * groups.length, 120);  // итоговая ширина поля клеток (left:240 фиксирован)
+      chart7.setOption({
+        tooltip: Object.assign({ position:'top' }, tt(), { formatter: tip(iogvShort) }),
+        grid:{ left:240, width:gridW, top:60, bottom:90 },
+        xAxis:{ type:'category', data:groupsLabel, position:'top', axisLabel:{interval:0, fontSize:type==='школа'?13:15, color: T.text, fontWeight:700, fontFamily:'Manrope, Inter'}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        yAxis:{ type:'category', data:iogvShort, inverse:true, axisLabel:{fontSize:14,color: T.text2,fontFamily:'Inter',fontWeight:500}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        visualMap:visualMap, series:[Object.assign({name:metric,data:heatmapData}, heatSeries)],
+      }, true);
+      /* строка «Санкт-Петербург» (агрегат по городу) */
+      var cityData = [];
+      groups.forEach(function(g, xi){
+        var sub = rows.filter(function(r){ return r.group_label===g; }); if (!sub.length) return;
+        var students = sub.reduce(function(s,r){return s+r.kids_or_students;},0);
+        var classes = sub.reduce(function(s,r){return s+r.groups_or_classes;},0);
+        var avg = classes ? +(students/classes).toFixed(1) : 0;
+        var totalStud = rows.reduce(function(s,r){return s+r.kids_or_students;},0);
+        var pct = totalStud ? +(students*100/totalStud).toFixed(1) : 0;
+        var val = metric==='avg'?avg:metric==='students'?students:pct;
+        cityData.push({ value:[xi,0,val], students:students, classes:classes, avg:avg, pct:pct });
+      });
+      chart7city.setOption({
+        tooltip: Object.assign({ position:'top' }, tt(), { formatter: tip(['Санкт-Петербург']) }),
+        grid:{ left:240, width:gridW, top:10, bottom:30, containLabel:false },   /* та же ширина поля, что и у chart7 → столбцы совпадают */
+        xAxis:{ type:'category', data:groupsLabel, axisLabel:{show:false}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        yAxis:{ type:'category', data:['Санкт-Петербург'], axisLabel:{fontSize:15,color: T.text,fontWeight:800,fontFamily:'Manrope, Inter'}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        visualMap:Object.assign({}, visualMap, {show:false}),
+        series:[Object.assign({name:metric,data:cityData}, heatSeries)],
+      }, true);
+      chart7city.resize();
+    }
+
+    /* ── «Год по ИОГВ»: матрица года(строки) × классы(столбцы) для ОДНОГО ИОГВ ──
+       Показывает динамику выбранного ИОГВ по годам. Строки СПб тут нет (один ИОГВ). */
+    function renderByIogv7(rows, type, metric, iogvName, groups, groupsLabel) {
+      var T = t();
+      chart7city.clear();
+      document.getElementById('chart7city').style.display = 'none';
+      document.getElementById('chart7citySep').style.display = 'none';
+
+      var scale = document.querySelector('#scaleBtns7 .active-tab').dataset.scale;
+      var norm  = type==='школа' ? 25 : 22;
+
+      // Ось Y — года выбранного ИОГВ (по возрастанию)
+      var years = Array.from(new Set(rows.map(function(r){ return r.year; }))).sort(function(a,b){ return a-b; });
+      var yearLabels = years.map(String);
+
+      // Среднее наполняемости по ГОРОДУ за КАЖДЫЙ год = все дети ÷ все классы выбранного типа по всем ИОГВ.
+      // {2021: 24.3, 2022: 25.1, ...}. Нужно для шкалы «city»: каждый год сравнивается со своим средним.
+      var cityAvgByYear = {};
+      years.forEach(function(yr){
+        var all = rawData7.filter(function(r){ return r.education_type===type && r.iogv_shortname && r.year===yr; });
+        var k=all.reduce(function(s,r){return s+r.kids_or_students;},0), c=all.reduce(function(s,r){return s+r.groups_or_classes;},0);
+        cityAvgByYear[yr] = c ? k/c : norm;
+      });
+      // Режим «отклонение»: avg + шкала city → красим по разнице (ячейка − среднее своего года), а не по абсолюту.
+      var devMode = (metric==='avg' && scale==='city');
+
+      // Матрица: год (yi) × класс (xi)
+      var heatmapData = [];
+      years.forEach(function(yr, yi){ groups.forEach(function(g, xi){
+        var r = rows.find(function(x){ return x.year===yr && x.group_label===g; });
+        if (r){
+          var val = metric==='avg'?r.avg_per_group:metric==='students'?r.kids_or_students:r.pct;
+          // colorVal — что идёт в visualMap (цвет). В devMode это отклонение от среднего города за этот год.
+          var colorVal = devMode ? (r.avg_per_group - cityAvgByYear[yr]) : val;
+          heatmapData.push({ value:[xi,yi,colorVal], display:val, students:r.kids_or_students, classes:r.groups_or_classes,
+                             avg:r.avg_per_group, pct:r.pct, cityAvg:cityAvgByYear[yr] }); }
+      }); });
+
+      // Защита от пустоты (см. renderHeatmap7) — иначе visualMap ломается необратимо
+      if (!heatmapData.length) {
+        chart7.setOption({
+          title: { text: 'Нет данных по выбранному ИОГВ', left:'center', top:'middle',
+                   textStyle:{ color: T.muted, fontSize:16, fontFamily:'Manrope, Inter' } },
+          tooltip:{ show:false }, xAxis:{ show:false }, yAxis:{ show:false }, visualMap:[], series:[],
+        }, true);
+        return;
+      }
+
+      var visualMap;
+      if (devMode) {
+        // Шкала ОТКЛОНЕНИЯ: центр = 0 (= ровно среднее своего года). Делаем симметричной:
+        // максимальный модуль отклонения в обе стороны → синий (ниже) ... нейтраль (0) ... красный (выше).
+        var devs = heatmapData.map(function(d){ return d.value[2]; }).filter(function(v){ return typeof v==='number' && !isNaN(v); });
+        var maxAbs = devs.length ? Math.max.apply(null, devs.map(Math.abs)) : 1;
+        if (maxAbs < 0.5) maxAbs = 0.5;             // чтобы при крошечных отклонениях не было «всё одинаковое»
+        var T2 = t();
+        visualMap = { calculable:true, orient:'horizontal', left:'center', bottom:10, itemWidth:22, itemHeight:320,
+          textStyle:{color: T2.text2,fontSize:13,fontFamily:'Inter',fontWeight:500},
+          min:-maxAbs, max:maxAbs, precision:1, text:['Выше среднего','Ниже среднего'],
+          /* Светлая тёплая диверг-шкала (как в buildVisualMap7): ниже = хвоя, центр = крем, выше = терракот.
+             Числа читаются на всех ячейках. */
+          inRange:{ color:['#A7C4B5','#CFE0D6','#ECE4D3','#F4EBD9','#F1D9B8','#E8B98A','#D98C5A','#C2734A'] } };
+      } else {
+        // Обычный режим (норматив или другие метрики) — как раньше, шкала по абсолютному значению.
+        var center = (metric==='avg') ? norm : 0;
+        visualMap = buildVisualMap7(metric, heatmapData, center);
+      }
+      // Сноска: в devMode поясняем «цвет = отклонение от среднего города того же года».
+      updateNormNote7ByIogv(metric, scale, type, devMode, cityAvgByYear, years);
+
+      // В ячейке показываем НАСТОЯЩЕЕ число (d.display), даже если цвет — по отклонению.
+      var labelFormatter = function(p){ var d=p.data; var v = (d && d.display!==undefined) ? d.display : p.value[2];
+        if (metric==='students') return v.toLocaleString('ru-RU'); if (metric==='pct') return v+'%'; return v; };
+      var tip = function(p){ var d=p.data;
+        // Столбец среднего (у него поле _avg) — своя подсказка.
+        if (d && d._avg!==undefined) return 'Среднее по городу · '+d._year+'<br/><b>'+d._avg.toFixed(1)+'</b> чел/'+(type==='школа'?'класс':'группа');
+        var xi=d.value[0], yi=d.value[1];
+        var devLine = devMode ? ('Среднее города ('+yearLabels[yi]+'): <b>'+d.cityAvg.toFixed(1)+'</b><br/>Отклонение: <b>'+(d.value[2]>=0?'+':'')+d.value[2].toFixed(1)+'</b> чел.<br/>') : '';
+        return '<b style="color:'+T.accent2+'">'+shortIogv(iogvName)+' · '+yearLabels[yi]+'</b><br/>Параллель: <b>'+groupsLabel[xi]+'</b><br/>'+
+          (type==='школа'?'Учащихся':'Воспитанников')+': <b>'+d.students.toLocaleString('ru-RU')+'</b><br/>'+
+          (type==='школа'?'Классов':'Групп')+': <b>'+d.classes+'</b><br/>Наполняемость: <b>'+d.avg+'</b> чел.<br/>'+devLine+'Доля: <b>'+d.pct+'%</b>'; };
+      /* Текст ячеек — фиксированный тёмный (ячейки всегда светлые), см. пояснение в renderHeatmap7 */
+      var heatSeries = { type:'heatmap', label:{ show:true, formatter:labelFormatter, fontSize:type==='школа'?12:16, color:'#2B2A28', fontWeight:700, fontFamily:'Inter' },
+        itemStyle:{ borderColor: T.surface, borderWidth:3, borderRadius:6 },
+        emphasis:{ itemStyle:{ shadowBlur:12, shadowColor:'rgba(60,50,40,0.35)', borderColor:'#2B2A28', borderWidth:2 } }, progressive:0, animationDuration:400 };
+
+      // ── Отдельный столбец «Среднее по городу» справа (только в devMode) ──
+      // Это НЕ heatmap-ячейки (их бы покрасил visualMap), а отдельная серия с фиксированным серым цветом.
+      // Рисуем его как ещё одну категорию на оси X с отступом-разделителем перед ним.
+      var xCats = groupsLabel.slice();
+      var avgColData = [];
+      if (devMode) {
+        xCats.push('');               // пустой столбец-отступ (визуальный разрыв)
+        xCats.push('Ср. по СПб');      // столбец среднего
+        var avgXi = xCats.length - 1; // его индекс по X
+        years.forEach(function(yr, yi){
+          avgColData.push({ value:[avgXi, yi, cityAvgByYear[yr]], _avg:cityAvgByYear[yr], _year:yr });
+        });
+      }
+      // Серия столбца среднего: серый фон, число = среднее города за год, вне visualMap.
+      var avgColSeries = { type:'heatmap', data:avgColData,
+        label:{ show:true, formatter:function(p){ return p.data._avg.toFixed(1); }, fontSize:type==='школа'?12:15, color:T.text, fontWeight:800, fontFamily:'Inter' },
+        itemStyle:{ color: t().surface2, borderColor:T.surface, borderWidth:3, borderRadius:6 },  // фикс. серый — НЕ зависит от visualMap
+        tooltip:{ show:true, formatter:function(p){ return 'Среднее по городу · '+p.data._year+'<br/><b>'+p.data._avg.toFixed(1)+'</b> чел/'+(type==='школа'?'класс':'группа'); } },
+        emphasis:{ disabled:true }, silent:false };
+
+      // Серии: [0] основная карта (её красит visualMap), [1] столбец среднего (только в devMode, свой цвет).
+      var series = [Object.assign({name:metric,data:heatmapData}, heatSeries)];
+      if (devMode) series.push(avgColSeries);
+      // visualMap привязываем ТОЛЬКО к серии 0 (seriesIndex:0), иначе он бы перекрасил и столбец среднего.
+      var vm = Object.assign({}, visualMap, { seriesIndex: 0 });
+
+      chart7.setOption({
+        title: { text: shortIogv(iogvName), left:'center', top:14, textStyle:{ color: T.text, fontSize:16, fontWeight:700, fontFamily:'Manrope, Inter' } },
+        tooltip: Object.assign({ position:'top' }, tt(), { formatter: tip }),
+        grid:{ left:120, right:50, top:70, bottom:90 },
+        // xAxis теперь xCats: в devMode там добавлены пустой столбец-отступ и «Ср. город».
+        // interval:0 — показывать ВСЕ подписи (без этого ECharts при нехватке места прячет каждую вторую → «1 кл, _, 3 кл»).
+        xAxis:{ type:'category', data:xCats, position:'top', axisLabel:{interval:0, fontSize:type==='школа'?13:15, color: T.text, fontWeight:700, fontFamily:'Manrope, Inter'}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        yAxis:{ type:'category', data:yearLabels, inverse:true, axisLabel:{fontSize:14,color: T.text2,fontFamily:'Inter',fontWeight:600}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        visualMap:vm, series:series,
+      }, true);
+    }
+
+    /* Обновляет сноску под фильтрами heatmap (#normNote7). Единая логика для обеих
+       вкладок — «ИОГВ по годам» (renderHeatmap7) и «Год по ИОГВ» (renderByIogv7).
+       Сноска осмысленна ТОЛЬКО для метрики «наполняемость» (avg): она поясняет шкалу
+       цвета. Для «Контингента» (students) и «Доли, %» (pct) цветовой шкалы «норматив/
+       среднее» нет → сноску прячем целиком (в т.ч. строку «Шкала относительно среднего
+       по городу…»), и для школ, и для садов.
+         metric='avg' + scale='norm' → текст про норматив СанПиН.
+         metric='avg' + scale='city' → само среднее по городу (чел/класс) за указанный год. */
+    function updateNormNote7(metric, scale, type, cityAvg, year) {
+      var el = document.getElementById('normNote7'); if (!el) return;
+      if (metric !== 'avg') { el.style.display = 'none'; return; }  // Контингент/Доля — сноска не нужна
+      el.style.display = '';
+      if (scale === 'city') {
+        el.innerHTML =
+          'Шкала относительно <b>среднего по городу</b>: <b>' + cityAvg.toFixed(1) + ' чел/' +
+          (type==='школа'?'класс':'группа') + '</b> в ' + year + ' г. ';
+      } else {
+        el.innerHTML =
+          '* Норматив СанПиН 2.4.3648-20 (25 чел/класс для школ, 22 для садов) формально <b>утратил силу с 2021 г.</b>';
+      }
+    }
+
+    /* Сноска для вкладки «Год по ИОГВ». Отличие от updateNormNote7: тут не один год, а ось лет.
+       devMode (avg+city) → поясняем, что цвет = отклонение от среднего ГОРОДА за ТОТ ЖЕ год
+       (каждый год сравнивается со своим), и среднее показано отдельным столбцом справа. */
+    function updateNormNote7ByIogv(metric, scale, type, devMode, cityAvgByYear, years) {
+      var el = document.getElementById('normNote7'); if (!el) return;
+      if (metric !== 'avg') { el.style.display = 'none'; return; }   // сноска только для наполняемости
+      el.style.display = '';
+      if (devMode) {
+        // соберём краткий список «год: среднее» для прозрачности
+        var parts = years.map(function(y){ return y+': '+cityAvgByYear[y].toFixed(1); });
+        el.innerHTML =
+          'Цвет = <b>отклонение от среднего по городу за тот же год</b> (нейтраль = ровно среднее, ' +
+          'синий — ниже, красный — выше). Среднее города по годам ('+(type==='школа'?'чел/класс':'чел/группа')+'): <b>' +
+          parts.join(' · ') + '</b>. Само среднее — в столбце справа.';
+      } else {
+        el.innerHTML =
+          '* Норматив СанПиН 2.4.3648-20 (25 чел/класс для школ, 22 для садов) формально <b>утратил силу с 2021 г.</b>';
+      }
+    }
+
+    // buildVisualMap7 — настраивает visualMap (цветовую шкалу-легенду внизу карты): какому
+    // числу какой цвет. center — точка «нормы». Для каждой метрики своя палитра и диапазон.
+    function buildVisualMap7(metric, heatmapData, center) {
+      var T = t();
+      var base = { calculable:true, orient:'horizontal', left:'center', bottom:10, itemWidth:22, itemHeight:320, textStyle:{color: T.text2,fontSize:13,fontFamily:'Inter',fontWeight:500} };  // общие настройки шкалы
+      /* Отфильтровываем null/undefined (avg_per_group бывает null, напр. сады «до 1 года»),
+         иначе Math.min их считает за 0 и занижает диапазон. Если после фильтра пусто —
+         подстраховка диапазоном вокруг center. */
+      var allVals = heatmapData.map(function(d){ return d.value[2]; }).filter(function(v){ return typeof v==='number' && !isNaN(v); });
+      if (!allVals.length) allVals = [center];
+      if (metric==='avg') {
+        var minV=Math.min.apply(null,allVals), maxV=Math.max.apply(null,allVals), span=Math.max(center-minV, maxV-center);
+        /* РЕДИЗАЙН ШКАЛЫ (главная правка читаемости):
+           Раньше диверг-палитра уходила в очень ТЁМНЫЕ концы (глубокая сталь #1E3A5F и
+           бордовый #9A1F2D) — на них числа сливались и не читались.
+           Теперь СВЕТЛАЯ тёплая диверг-шкала: недогруз = прохладная хвоя (светлая),
+           норма = тёплый крем (почти как фон), перегруз = терракот/охра. Все тона
+           ПАСТЕЛЬНЫЕ → тёмный текст ячеек читается ВЕЗДЕ. Семантика сохранена
+           (холоднее = недогруз, теплее = перегруз). */
+        return Object.assign({}, base, { min:Math.floor(center-span), max:Math.ceil(center+span), precision:1, text:['Перегруз','Недогруз'],
+          inRange:{ color:['#A7C4B5','#CFE0D6','#ECE4D3','#F4EBD9','#F1D9B8','#E8B98A','#D98C5A','#C2734A'] } });
+      } else if (metric==='students') {
+        /* Контингент — последовательная шкала «крем → хвоя» (светлая, тёмный текст читается) */
+        return Object.assign({}, base, { min:0, max:Math.max.apply(null,allVals), text:['Больше','Меньше'],
+          inRange:{ color:['#F5F1E8','#DDE8DF','#BCD4C6','#94BBA7','#6BA188','#3E7C6A'] } });
+      }
+      /* Доля % — последовательная тёплая шкала «крем → терракот» (светлая) */
+      return Object.assign({}, base, { min:0, max:Math.max.apply(null,allVals), text:['Больше','Меньше'],
+        inRange:{ color:['#FBF6EE','#F3E6D2','#E9CFAE','#DDB184','#CE9061','#C2734A'] } });
+    }
+
+    /* ── ВКЛАДКА «Доля населения в образовании»: матрица районы×года (teal) ── */
+    function renderCoverage7() {
+      var T = t();
+      var all = popData7.filter(function(r){ return r.iogv_shortname && r.iogv_shortname.indexOf('Администрация')===0 && r.iogv_shortname.indexOf('район')>-1; });
+      /* ИСКЛЮЧЁННЫЕ ГОДЫ (показываем только 2021–2024):
+           • 2017–2020 — есть только население, образование (школьники/сады) = 0 → доля считаться не может.
+           • 2025      — наоборот: есть образование, но население районов = null → делить не на что.
+         Когда данные за эти годы появятся в population_education.json — просто убери год из массива,
+         и столбец вернётся сам (логика data-driven, код менять не надо). */
+      var COVERAGE_EXCLUDE_YEARS = [2017, 2018, 2019, 2020, 2025];
+      var years = Array.from(new Set(all.map(function(r){ return r.year; }))).filter(function(y){ return COVERAGE_EXCLUDE_YEARS.indexOf(y)===-1; }).sort(function(a,b){return a-b;});
+      var iogvs = Array.from(new Set(all.map(function(r){ return r.iogv_shortname; }))).sort();
+      var iogvShort = iogvs.map(shortIogv);
+      /* Берём запись с ВАЛИДНЫМ населением (есть дубли с area=ЛО и population:null) */
+      function pickRecord(name, year){ var c=all.filter(function(r){return r.iogv_shortname===name && r.year===year;}); return c.find(function(r){return (+r.population||0)>0;})||c[0]||null; }
+      function cell(name, year, xi, yi){
+        var r=pickRecord(name,year);
+        var school=r?(+r.school_students||0):0, garden=r?(+r.garden_kids||0):0, pop=r?(+r.population||0):0, inEdu=school+garden;
+        var hasVal=pop>0&&inEdu>0, pct=hasVal?+(inEdu*100/pop).toFixed(2):'-';
+        return { value:[xi,yi,hasVal?pct:'-'], school:school, garden:garden, pop:pop, inEdu:inEdu, hasVal:hasVal, year:year };
+      }
+      var covData=[]; iogvs.forEach(function(name,yi){ years.forEach(function(year,xi){ covData.push(cell(name,year,xi,yi)); }); });
+      var cityData = years.map(function(year,xi){ var s=0,g=0,p=0; iogvs.forEach(function(name){ var r=pickRecord(name,year); if(r){s+=(+r.school_students||0);g+=(+r.garden_kids||0);p+=(+r.population||0);} });
+        var ie=s+g, hv=p>0&&ie>0; return { value:[xi,0,hv?+(ie*100/p).toFixed(2):'-'], school:s, garden:g, pop:p, inEdu:ie, hasVal:hv, year:year }; });
+      var allPct = covData.concat(cityData).filter(function(d){return d.hasVal;}).map(function(d){return d.value[2];});
+      var maxPct = allPct.length ? Math.max.apply(null,allPct) : 1;
+      var yearLabels = years.map(String);
+      var covFmt = function(label){ return function(p){ var d=p.data;
+        if (!d.hasVal) return '<b style="color:'+T.accent2+'">'+label+' · '+d.year+'</b><br/>Нет данных';
+        return '<b style="color:'+T.accent2+'">'+label+' · '+d.year+'</b><br/>Школьников: <b>'+d.school.toLocaleString('ru-RU')+'</b><br/>Воспитанников ДОУ: <b>'+d.garden.toLocaleString('ru-RU')+'</b><br/>Население: <b>'+d.pop.toLocaleString('ru-RU')+'</b><br/>Доля в образовании: <b>'+d.value[2]+'%</b>'; }; };
+      /* Coverage — светлая шкала «крем → хвоя» (единая с метрикой "Доля,%", читаемая) */
+      var visualMap = { min:0, max:maxPct, calculable:true, orient:'horizontal', left:'center', bottom:10, itemWidth:22, itemHeight:320, precision:1,
+        text:['Больше','Меньше'], textStyle:{color: T.text2,fontSize:13,fontFamily:'Inter',fontWeight:500}, inRange:{ color:['#F5F1E8','#DDE8DF','#BCD4C6','#94BBA7','#6BA188','#3E7C6A'] } };
+      var covSeries = { type:'heatmap', label:{ show:true, formatter:function(p){ return p.data.hasVal ? p.value[2]+'%' : '—'; }, fontSize:14, color:'#2B2A28', fontWeight:700, fontFamily:'Inter' },
+        itemStyle:{ borderColor: T.surface, borderWidth:3, borderRadius:6 }, emphasis:{ itemStyle:{ shadowBlur:12, shadowColor:'rgba(60,50,40,0.35)', borderColor:'#2B2A28', borderWidth:2 } } };
+      var xAxisCommon = { type:'category', data:yearLabels, position:'top', axisLabel:{fontSize:16,color: T.text,fontWeight:800,fontFamily:'Manrope, Inter'}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} };
+      chart7.setOption({
+        title:{show:false},
+        tooltip: Object.assign({ position:'top' }, tt(), { formatter:function(p){ return covFmt(iogvShort[p.data.value[1]])(p); } }),
+        grid:{ left:240, right:50, top:60, bottom:90 },
+        xAxis:xAxisCommon,
+        yAxis:{ type:'category', data:iogvShort, inverse:true, axisLabel:{fontSize:14,color: T.text2,fontFamily:'Inter',fontWeight:500}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        visualMap:visualMap, series:[Object.assign({name:'coverage',data:covData}, covSeries)],
+      }, true);
+      chart7city.setOption({
+        tooltip: Object.assign({ position:'top' }, tt(), { formatter: covFmt('Санкт-Петербург') }),
+        grid:{ left:240, right:50, top:10, bottom:30, containLabel:false },
+        xAxis:{ type:'category', data:yearLabels, axisLabel:{show:false}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        yAxis:{ type:'category', data:['Санкт-Петербург'], axisLabel:{fontSize:15,color: T.text,fontWeight:800,fontFamily:'Manrope, Inter'}, axisLine:{show:false}, axisTick:{show:false}, splitArea:{show:false} },
+        visualMap:Object.assign({}, visualMap, {show:false}), series:[Object.assign({name:'coverage',data:cityData}, covSeries)],
+      }, true);
+      chart7city.resize();
+    }
+
+    /* ── РОЗА (агрегация по СПб или выбранному ИОГВ) ── */
+    function renderRose7(rows, type, metric, year, groups, groupsLabel, iogv) {
+      var T = t();
+      var iogvLabel = (iogv==='ALL') ? 'СПб (все районы)' : shortIogv(iogv);
+      var scopeLabel = (iogv==='ALL') ? 'СПб' : iogvLabel;
+      var byParallel = groups.map(function(g,i){ var subset=rows.filter(function(r){return r.group_label===g;});
+        var students=subset.reduce(function(s,r){return s+r.kids_or_students;},0), classes=subset.reduce(function(s,r){return s+r.groups_or_classes;},0);
+        return { label:groupsLabel[i], students:students, classes:classes, avg:classes?+(students/classes).toFixed(1):0 }; });
+      var totalStud=byParallel.reduce(function(s,x){return s+x.students;},0), totalCls=byParallel.reduce(function(s,x){return s+x.classes;},0);
+      // Заглушка «Нет данных»: если воспитанников/учащихся за год вообще нет (напр. сады 2022) —
+      // не рисуем нулевую розу, прячем плашки и показываем надпись. Появятся данные → роза вернётся.
+      if (totalStud===0) {
+        document.getElementById('stats7').style.display='none';
+        chart7.setOption({
+          title:{ text:'Нет данных за '+year+' год', left:'center', top:'middle', textStyle:{ color:T.muted, fontSize:16, fontFamily:'Manrope, Inter' } },
+          tooltip:{show:false}, series:[], graphic:[],
+        }, true);
+        return;
+      }
+      byParallel.forEach(function(p){ p.pct = totalStud ? +(p.students*100/totalStud).toFixed(1) : 0; });
+      var avgCity = totalCls ? (totalStud/totalCls).toFixed(1) : '—';
+      var norm = type==='школа' ? 25 : 22;
+      /* Семафор KPI-плашки наполняемости (тёплая гамма): терракот (перегруз) → хвоя (норма) → пыльно-синий (запас) */
+      var avgClass = avgCity>=norm ? '#C2734A' : avgCity>=norm-3 ? '#3E7C6A' : '#6E84A6';
+      /* KPI-карточки сводки — стилизованы под брендовый nap-stat-card */
+      // Плашки «Сводки» без цвета. Оставлены только «Учащихся · СПб» и «Классов».
+      // Плашка «Наполняемость» (число над розой) убрана по просьбе — она дублировала диаграмму.
+      document.getElementById('stats7').innerHTML =
+        '<div class="nap-stat-card"><div class="label">'+(type==='школа'?'Учащихся':'Воспитанников')+' · '+scopeLabel+'</div><div class="val">'+totalStud.toLocaleString('ru-RU')+'</div><div class="hint">в '+year+' году</div></div>'+
+        '<div class="nap-stat-card"><div class="label">'+(type==='школа'?'Классов':'Групп')+'</div><div class="val">'+totalCls.toLocaleString('ru-RU')+'</div><div class="hint">'+(iogv==='ALL'?'всего по СПб':'в '+scopeLabel)+'</div></div>';
+
+      /* ФИКС «ГРЯЗНЫХ» ЦВЕТОВ РОЗЫ:
+         раньше интерполяция шла хвоя→охра→терракот и на стыках давала болотный (грязный)
+         оттенок. Теперь между «холодным» и «тёплым» концом стоит СВЕТЛО-КРЕМОВЫЙ нейтрал
+         (#EFE6D6) — переход чистый, без болота. Семантика: приглушённый синий (недогруз) →
+         мягкая хвоя → крем (норма) → тёплая охра → терракот (перегруз). */
+      var PALETTE = ['#5E7A9C','#7FAE9C','#EFE6D6','#E2A85A','#C2734A'];
+      function colorFor(avg){ var span=type==='школа'?8:6; var t=Math.max(0,Math.min(1,(avg-(norm-span))/(2*span)));
+        if (t<=0) return PALETTE[0]; if (t>=1) return PALETTE[PALETTE.length-1];
+        var pos=t*(PALETTE.length-1), i=Math.floor(pos); return interp(PALETTE[i], PALETTE[i+1], pos-i); }
+      function interp(c1,c2,t){ var a=toRgb(c1), b=toRgb(c2); return 'rgb('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+')'; }
+      function toRgb(c){ if (c.indexOf('#')===0) return [parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)]; var m=c.match(/\d+/g); return [+m[0],+m[1],+m[2]]; }
+      function lighten(c,a){ var m=toRgb(c); return 'rgb('+Math.round(m[0]+(255-m[0])*a)+','+Math.round(m[1]+(255-m[1])*a)+','+Math.round(m[2]+(255-m[2])*a)+')'; }
+      function darken(c,a){ var m=toRgb(c); return 'rgb('+Math.round(m[0]*(1-a))+','+Math.round(m[1]*(1-a))+','+Math.round(m[2]*(1-a))+')'; }
+      var data = byParallel.map(function(p){ var v=metric==='avg'?p.avg:metric==='students'?p.students:p.pct;
+        var baseColor=colorFor(p.avg);
+        var grad=new echarts.graphic.RadialGradient(0.5,0.5,0.9,[{offset:0,color:lighten(baseColor,0.25)},{offset:0.55,color:baseColor},{offset:1,color:darken(baseColor,0.15)}]);
+        return { name:p.label, value:v, students:p.students, classes:p.classes, avg:p.avg, pct:p.pct, itemStyle:{color:grad} }; });
+      /* Полупрозрачный фон лейбла зависит от темы (чтобы текст читался на любом фоне) */
+      var labelBg = T.surface;
+      chart7.setOption({
+        tooltip: Object.assign({ trigger:'item' }, tt(), {
+          formatter:function(p){ var d=p.data; return '<b style="color:'+T.accent2+'">'+p.name+'</b><br/>'+(type==='школа'?'Учащихся':'Воспитанников')+': <b>'+d.students.toLocaleString('ru-RU')+'</b><br/>'+(type==='школа'?'Классов':'Групп')+': <b>'+d.classes+'</b><br/>Наполняемость: <b>'+d.avg+'</b> чел.<br/>Доля от '+(type==='школа'?'школьников':'воспитанников')+': <b>'+d.pct+'%</b>'; } }),
+        legend:{show:false},
+        title:{ text:iogvLabel+' · '+year, subtext:'Метрика: '+(metric==='avg'?'наполняемость (чел/класс)':metric==='students'?'количество детей':'доля от общего, %'), left:'center', top:14, textStyle:{color: T.text,fontSize:20,fontWeight:800,fontFamily:'Manrope, Inter'}, subtextStyle:{color: T.text2,fontSize:14,fontFamily:'Inter',fontWeight:500} },
+        series:[{ name:'СПб', type:'pie', radius:['14%','78%'], center:['50%','56%'], roseType:'radius', data:data,
+          animationType:'scale', animationEasing:'cubicOut', animationDuration:500, animationDelay:function(idx){return idx*30;},
+          label:{ color: T.text, fontSize:13, fontWeight:600, fontFamily:'Inter', formatter:function(p){ var d=p.data; return '{b|'+p.name+'}\n{c|'+d.pct+'% · '+d.avg+' чел.}'; },
+            rich:{ b:{color: T.text,fontSize:15,fontWeight:800,lineHeight:20,padding:[4,10],backgroundColor:labelBg,borderRadius:6,fontFamily:'Manrope, Inter'}, c:{color: T.text2,fontSize:13,lineHeight:18,padding:[3,8],fontFamily:'Inter'} } },
+          labelLine:{ length:16, length2:20, smooth:0.3, lineStyle:{color: T.text2,width:1.5} },
+          itemStyle:{ borderColor: T.surface, borderWidth:1.5, borderRadius:10 },
+          emphasis:{ scale:true, scaleSize:14, itemStyle:{shadowBlur:50,borderColor: T.surface,borderWidth:2}, label:{fontSize:14} },
+          selectedMode:'single', select:{ itemStyle:{borderColor: T.surface,borderWidth:2} } }],
+      }, true);
+    }
+
+    window.addEventListener('resize', function(){ if (chart7) chart7.resize(); if (chart7city) chart7city.resize(); });
+  })();
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       СДЕРЖАННОЕ ПОЯВЛЕНИЕ БЛОКОВ ПРИ ПРОКРУТКЕ (reveal-on-scroll)
+       Вешаем класс .reveal на все карточки графиков и через IntersectionObserver
+       (браузерный «наблюдатель видимости») добавляем .is-visible, когда блок въезжает
+       в экран → он мягко проявляется (см. CSS .chart-card.reveal выше).
+       Уважаем системную настройку «меньше движения» — тогда показываем сразу без анимации.
+       ═══════════════════════════════════════════════════════════════ -->
+  <script>
+  (function(){
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.chart-card'));
+    if (!cards.length) return;
+    // Если пользователь просил «меньше анимаций» или браузер без IntersectionObserver — просто показать всё.
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) return;  // .reveal не вешаем → блоки видны как обычно
+
+    cards.forEach(function(c){ c.classList.add('reveal'); });    // прячем (чуть ниже + прозрачно)
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){
+          e.target.classList.add('is-visible');                 // плавно показываем
+          io.unobserve(e.target);                               // показали один раз — больше не следим
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });      // срабатывает, когда видно ~12% блока
+    cards.forEach(function(c){ io.observe(c); });
+  })();
+  </script>
+
+</body>
+</html>
